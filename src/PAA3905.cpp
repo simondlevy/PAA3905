@@ -162,16 +162,7 @@ uint8_t PAA3905::status()
 }
 
 
-void PAA3905::readMotionCount(int16_t *deltaX, int16_t *deltaY, uint8_t *SQUAL, uint32_t *Shutter)
-{
-    *deltaX =  ((int16_t) readByte(PAA3905_DELTA_X_H) << 8) | readByte(PAA3905_DELTA_X_L);
-    *deltaY =  ((int16_t) readByte(PAA3905_DELTA_Y_H) << 8) | readByte(PAA3905_DELTA_X_L);
-    *SQUAL =              readByte(PAA3905_SQUAL);
-    *Shutter = ((uint32_t)readByte(PAA3905_SHUTTER_H) << 16) | ((uint32_t)readByte(PAA3905_SHUTTER_M) << 8) | readByte(PAA3905_SHUTTER_L);
-}
-
-
-void PAA3905::readBurstMode(uint8_t * dataArray)
+void PAA3905::readBurstMode(void)
 {
     SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
 
@@ -182,9 +173,8 @@ void PAA3905::readBurstMode(uint8_t * dataArray)
     digitalWrite(MOSI, HIGH); // hold MOSI high during burst read
     delayMicroseconds(2);
 
-    for(uint8_t ii = 0; ii < 14; ii++)
-    {
-        dataArray[ii] = SPI.transfer(0);
+    for(uint8_t ii = 0; ii < 14; ii++) {
+        _data[ii] = SPI.transfer(0);
     }
     digitalWrite(MOSI, LOW); // return MOSI to LOW
     digitalWrite(_cs, HIGH);
@@ -421,4 +411,58 @@ void PAA3905::enhancedDetection()
     writeByteDelay(0x52, 0xB4);
     writeByteDelay(0x7F, 0x00);
     writeByteDelay(0x5B, 0xA0); // 60
+}
+
+bool PAA3905::motionDataAvailable(void)
+{
+    return (bool)(_data[0] & 0x80);
+}
+
+bool PAA3905::challengingSurfaceDetected(void)
+{
+    return (bool)(_data[0] && 0x01);
+}
+
+uint16_t PAA3905::getDeltaX(void)
+{
+    return ((int16_t)_data[3] << 8) | _data[2];
+}
+
+uint16_t PAA3905::getDeltaY(void)
+{
+    return ((int16_t)_data[5] << 8) | _data[4];
+}
+
+uint8_t PAA3905::getSurfaceQuality(void)
+{
+    return _data[7];
+}
+
+uint8_t PAA3905::getRawDataSum(void)
+{
+    return _data[8];
+}
+
+uint8_t PAA3905::getRawDataMax(void)
+{
+    return _data[9];
+}
+
+uint8_t PAA3905::getRawDataMin(void)
+{
+    return _data[10];
+}
+
+uint32_t PAA3905::getShutter(void)
+{
+    // 23-bit positive integer 
+    return (((uint32_t)_data[11] << 16) |
+            ((uint32_t)_data[12] << 8) |
+            _data[13])
+           & 0x7FFFFF; 
+}
+
+uint8_t PAA3905::getLightMode(void)
+{
+    return (_data[1] & 0xC0) >> 6;  
 }

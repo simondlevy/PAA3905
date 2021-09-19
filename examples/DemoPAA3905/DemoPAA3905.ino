@@ -46,10 +46,10 @@ static uint8_t                   RESOLUTION     = 0x2A;
 
 static PAA3905 sensor(CS_PIN);
 
-static volatile bool motionDetect;
+static volatile bool gotMotionInterrupt;
 static void interruptHandler()
 {
-    motionDetect = true;
+    gotMotionInterrupt = true;
 }
 
 void setup() 
@@ -105,41 +105,39 @@ void setup()
 void loop() {
 
     static uint8_t frameArray[1225];
-    static uint8_t dataArray[14];
     static uint8_t iterations;
 
     iterations++;
 
-    // Navigation
-    if (motionDetect){
-        motionDetect = false;
-        sensor.readBurstMode(dataArray); // use burst mode to read all of the data
+    if (gotMotionInterrupt){
+
+        gotMotionInterrupt = false;
+
+        sensor.readBurstMode(); // use burst mode to read all of the data
     }
 
-    if (dataArray[0] & 0x80) {   // Check if motion data available
+    if (sensor.motionDataAvailable()) {
 
-        if (dataArray[0]  & 0x01) {
+        if (sensor.challengingSurfaceDetected()) {
             Debugger::printf("Challenging surface detected!\n");
         }
 
-        uint16_t deltaX = ((int16_t)dataArray[3] << 8) | dataArray[2];
-        uint16_t deltaY = ((int16_t)dataArray[5] << 8) | dataArray[4];
-        uint8_t SQUAL = dataArray[7];      // surface quality
-        uint8_t RawDataSum = dataArray[8];
-        uint8_t RawDataMax = dataArray[9];
-        uint8_t RawDataMin = dataArray[10];
-        uint32_t Shutter = ((uint32_t)dataArray[11] << 16) | ((uint32_t)dataArray[12] << 8) | dataArray[13];
-        Shutter &= 0x7FFFFF; // 23-bit positive integer 
-
-        uint8_t light = (dataArray[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
+        uint16_t deltaX = sensor.getDeltaX();
+        uint16_t deltaY = sensor.getDeltaY();
+        uint8_t squal = sensor.getSurfaceQuality();
+        uint8_t rawDataSum = sensor.getRawDataSum();
+        uint8_t rawDataMax = sensor.getRawDataMax();
+        uint8_t rawDataMin = sensor.getRawDataMin();
+        uint32_t shutter = sensor.getShutter(); // 23-bit positive integer 
+        uint8_t lightMode = sensor.getLightMode();
 
         // Don't report data if under thresholds
-        if ((light == PAA3905::LIGHT_BRIGHT) && (SQUAL < 25) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if ((light == PAA3905::LIGHT_LOW) && (SQUAL < 70) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if ((light == PAA3905::LIGHT_SUPER_LOW) && (SQUAL < 85) && (Shutter >= 0x025998)) deltaX = deltaY = 0;
+        if ((lightMode == PAA3905::LIGHT_BRIGHT) && (squal < 25) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
+        if ((lightMode == PAA3905::LIGHT_LOW) && (squal < 70) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
+        if ((lightMode == PAA3905::LIGHT_SUPER_LOW) && (squal < 85) && (shutter >= 0x025998)) deltaX = deltaY = 0;
 
         // Report mode
-        switch (light) {
+        switch (lightMode) {
             case PAA3905::LIGHT_BRIGHT:
                 Debugger::printf("Bright Mode\n");
                 break;
@@ -155,9 +153,9 @@ void loop() {
 
         // Data and Diagnostics output
         Debugger::printf("X: %d , Y: %d\n", deltaX, deltaY);
-        Debugger::printf("Number of Valid Features: %d, Shutter: 0x%02X\n", 4*SQUAL, Shutter);
-        Debugger::printf("Max Raw Data: %d, Min Raw Data: %d, Avg RawData: %d\n\n",
-                RawDataMax, RawDataMin, RawDataSum);
+        Debugger::printf("Number of Valid Features: %d, shutter: 0x%02X\n", 4*squal, shutter);
+        Debugger::printf("Max raw Data: %d, Min raw Data: %d, Avg rawData: %d\n\n",
+                rawDataMax, rawDataMin, rawDataSum);
     }
 
     // Frame capture
