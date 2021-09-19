@@ -62,26 +62,20 @@ void PAA3905::setResolution(uint8_t res)
 }
 
 
-uint8_t PAA3905::getResolution() 
+float PAA3905::getResolution() 
 {
-    uint8_t temp = readByte(PAA3905_RESOLUTION);
-    return temp;
+    return (readByte(PAA3905_RESOLUTION) + 1) * 200.f / 8600 * 11.914; 
 }
-
 
 void PAA3905::setOrientation(uint8_t orient) 
 {
     writeByte(PAA3905_ORIENTATION, orient);
 }
 
-
 uint8_t PAA3905::getOrientation() 
 {
-    uint8_t temp = readByte(PAA3905_ORIENTATION);
-    return temp;
+    return readByte(PAA3905_ORIENTATION);
 }
-
-
 
 void PAA3905::initRegisters(uint8_t mode)
 {
@@ -157,8 +151,7 @@ void PAA3905::powerup()
 
 uint8_t PAA3905::status()
 {
-    uint8_t temp = readByte(PAA3905_MOTION); // clears motion interrupt
-    return temp;
+    return readByte(PAA3905_MOTION); // clears motion interrupt
 }
 
 

@@ -77,7 +77,7 @@ class PAA3905 {
 
         void setResolution(uint8_t res);
 
-        uint8_t getResolution();
+        float getResolution();
 
         void reset();
 

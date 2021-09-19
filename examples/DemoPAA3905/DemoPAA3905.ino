@@ -78,8 +78,8 @@ void setup()
     sensor.setMode(DETECTION_MODE, AUTO_MODE); 
 
     sensor.setResolution(RESOLUTION);         
-    float resolution = (sensor.getResolution() + 1) * 200.0f/8600.0f; 
-    Debugger::printf("Resolution is: %f CPI per meter height", resolution * 11.914f);
+    Debugger::printf("Resolution is: %f CPI per meter height\n\n",
+            sensor.getResolution());
 
     sensor.setOrientation(ORIENTATION);
     uint8_t orientation = sensor.getOrientation();
