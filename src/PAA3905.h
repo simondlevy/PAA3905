@@ -30,6 +30,13 @@ class PAA3905 {
             LIGHT_UKNOWN
         } light_mode_t;
 
+        typedef enum {
+            ORIENTATION_NORMAL  = 0x00,
+            ORIENTATION_XINVERT = 0x80,
+            ORIENTATION_YINVERT = 0x40,
+            ORIENTATION_SWAP    = 0x20,
+        } orientation_t;
+
         PAA3905(uint8_t cspin);
 
         boolean begin(void);

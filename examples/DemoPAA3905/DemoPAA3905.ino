@@ -40,9 +40,9 @@ static const uint8_t MOT_PIN =  8;  // use as data ready interrupt
 
 // Sensor configuration
 static PAA3905::detection_mode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
-static PAA3905::auto_mode_t AUTO_MODE = PAA3905::AUTO_MODE_01; 
-static uint8_t RESOLUTION = 0x2A;
-static uint8_t ORIENTATION = 0x00;// for X invert 0x80, for Y invert 0x40, for X and Y swap, 0x20, for all three 0XE0 (bits 5 - 7 only)
+static PAA3905::auto_mode_t AUTO_MODE           = PAA3905::AUTO_MODE_01; 
+static PAA3905::orientation_t ORIENTATION       = PAA3905::ORIENTATION_NORMAL;
+static uint8_t RESOLUTION                       = 0x2A;
 
 static PAA3905 sensor(CS_PIN);
 
