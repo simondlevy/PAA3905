@@ -49,8 +49,6 @@ static uint32_t Shutter;
 static volatile bool motionDetect;
 static uint8_t statusCheck;
 static uint8_t frameArray[1225], dataArray[14], SQUAL, RawDataSum, RawDataMin, RawDataMax;
-static uint8_t iterations;
-static uint32_t frameTime;
 
 static PAA3905 sensor(CS_PIN);
 
@@ -109,6 +107,8 @@ void setup()
 } // setup
 
 void loop() {
+
+    static uint8_t iterations;
 
     iterations++;
 
@@ -169,7 +169,7 @@ void loop() {
         Serial.println("Hold camera still for frame capture!");
         delay(4000);
 
-        frameTime = millis();
+        uint32_t frameTime = millis();
         sensor.enterFrameCaptureMode();   
         sensor.captureFrame(frameArray);
         sensor.exitFrameCaptureMode(); // exit fram capture mode
