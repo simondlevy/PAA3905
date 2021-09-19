@@ -94,17 +94,7 @@ void PAA3905::initRegisters(uint8_t mode)
 
 boolean PAA3905::checkID()
 {
-    // check device ID
-    uint8_t product_ID = readByte(PAA3905_PRODUCT_ID);
-    uint8_t revision_ID = readByte(PAA3905_REVISION_ID);
-    uint8_t inverse_product_ID = readByte(PAA3905_INVERSE_PRODUCT_ID);
-
-    Serial.print("Product ID = 0x"); Serial.print(product_ID, HEX); Serial.println(" should be 0xA2");
-    Serial.print("Revision ID = 0x0"); Serial.println(revision_ID, HEX); 
-    Serial.print("Inverse Product ID = 0x"); Serial.print(inverse_product_ID, HEX); Serial.println(" should be 0x5D"); 
-
-    if (product_ID != 0xA2 && inverse_product_ID != 0x5D) return false;
-    else return true;
+    return readByte(PAA3905_PRODUCT_ID) == 0xA2 && readByte(PAA3905_INVERSE_PRODUCT_ID) == 0x5D;
 }
 
 
