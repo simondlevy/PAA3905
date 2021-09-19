@@ -9,11 +9,6 @@
 
 #include <Arduino.h>
 
-#define bright        0
-#define lowlight      1
-#define superlowlight 2
-#define unknown       3
-
 class PAA3905 {
 
     public:
@@ -27,6 +22,13 @@ class PAA3905 {
             AUTO_MODE_01,
             AUTO_MODE_012,
         } auto_mode_t;
+
+        typedef enum {
+            LIGHT_BRIGHT,
+            LIGHT_LOW,
+            LIGHT_SUPER_LOW,
+            LIGHT_UKNOWN
+        } light_mode_t;
 
         PAA3905(uint8_t cspin);
 

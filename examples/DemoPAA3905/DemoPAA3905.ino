@@ -130,22 +130,22 @@ void loop() {
         uint32_t Shutter = ((uint32_t)dataArray[11] << 16) | ((uint32_t)dataArray[12] << 8) | dataArray[13];
         Shutter &= 0x7FFFFF; // 23-bit positive integer 
 
-        //   mode =    sensor.getMode();
-        uint8_t mode = (dataArray[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
+        uint8_t light = (dataArray[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
+
         // Don't report data if under thresholds
-        if ((mode == bright       ) && (SQUAL < 25) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if ((mode == lowlight     ) && (SQUAL < 70) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if ((mode == superlowlight) && (SQUAL < 85) && (Shutter >= 0x025998)) deltaX = deltaY = 0;
+        if ((light == PAA3905::LIGHT_BRIGHT) && (SQUAL < 25) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
+        if ((light == PAA3905::LIGHT_LOW) && (SQUAL < 70) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
+        if ((light == PAA3905::LIGHT_SUPER_LOW) && (SQUAL < 85) && (Shutter >= 0x025998)) deltaX = deltaY = 0;
 
         // Report mode
-        switch (mode) {
-            case bright:
+        switch (light) {
+            case PAA3905::LIGHT_BRIGHT:
                 Debugger::printf("Bright Mode\n");
                 break;
-            case lowlight:
+            case PAA3905::LIGHT_LOW:
                 Debugger::printf("Low Light Mode\n");
                 break;
-            case superlowlight:
+            case PAA3905::LIGHT_SUPER_LOW:
                 Debugger::printf("Super Low Light Mode\n");
                 break;
             default:
