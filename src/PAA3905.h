@@ -24,6 +24,11 @@ class PAA3905 {
 
     public:
 
+        typedef enum {
+            DETECTION_STANDARD,
+            DETECTION_ENHANCED
+        } detection_mode_t;
+
         PAA3905(uint8_t cspin);
 
         boolean begin(void);

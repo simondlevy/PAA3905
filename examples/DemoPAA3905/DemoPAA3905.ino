@@ -39,9 +39,12 @@ static const uint8_t CS_PIN  = 10;  // default chip select for SPI
 static const uint8_t MOT_PIN =  8;  // use as data ready interrupt
 
 // PAA3905 configuration
-static uint8_t mode = standardDetectionMode; // mode choices are standardDetectionMode (default) or enhancedDetectionMode
+PAA3905::detection_mode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
+
 static uint8_t autoMode = autoMode01;        // choices are autoMode01 and autoMode012 (includes superLowLight mode)
+
 static uint8_t pixelRes = 0x2A;  // choices are from 0x00 to 0xFF
+
 static float resolution;         // calculated (approximate) resolution (counts per delta) per meter of height
 
 // for X invert 0x80, for Y invert 0x40, for X and Y swap, 0x20, for all three 0XE0 (bits 5 - 7 only)
@@ -78,7 +81,7 @@ void setup()
 
     sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
 
-    sensor.setMode(mode, autoMode);         // set modes
+    sensor.setMode(DETECTION_MODE, autoMode);         // set modes
 
     sensor.setResolution(pixelRes);         // set resolution fraction of default 0x2A
     resolution = (sensor.getResolution() + 1) * 200.0f/8600.0f; // == 1 if pixelRes == 0x2A
@@ -134,7 +137,7 @@ void loop() {
         Shutter &= 0x7FFFFF; // 23-bit positive integer 
 
         //   mode =    sensor.getMode();
-        mode = (dataArray[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
+        uint8_t mode = (dataArray[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
         // Don't report data if under thresholds
         if ((mode == bright       ) && (SQUAL < 25) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
         if ((mode == lowlight     ) && (SQUAL < 70) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
@@ -192,7 +195,7 @@ void loop() {
         // Return to navigation mode
         sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
         delay(50);
-        sensor.setMode(mode, autoMode);         // set modes
+        sensor.setMode(DETECTION_MODE, autoMode);         // set modes
         sensor.setResolution(pixelRes);         // set resolution fraction of default 0x2A
         sensor.setOrientation(ORIENTATION);     // set orientation
         sensor.status();          // clear interrupt before entering main loop
