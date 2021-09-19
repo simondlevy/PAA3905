@@ -172,9 +172,10 @@ void loop() {
 
         for (uint8_t ii = 0; ii < 35; ii++) { // plot the frame data on the serial monitor (TFT display would be better)
         
-            Serial.print(ii); Serial.print(" "); 
             for (uint8_t jj = 0; jj < 35; jj++) {
-                Serial.print(frameArray[ii*35 + jj]); Serial.print(" ");  
+                uint8_t frameval = frameArray[ii*35 + jj];
+                Serial.print(frameval);
+                Serial.print(" ");  
             }
             Serial.println(" ");
         }
