@@ -43,15 +43,13 @@ static uint8_t mode = standardDetectionMode; // mode choices are standardDetecti
 static uint8_t autoMode = autoMode01;        // choices are autoMode01 and autoMode012 (includes superLowLight mode)
 static uint8_t pixelRes = 0x2A;  // choices are from 0x00 to 0xFF
 static float resolution;         // calculated (approximate) resolution (counts per delta) per meter of height
-static uint8_t orientation, orient; // for X invert 0x80, for Y invert 0x40, for X and Y swap, 0x20, for all three 0XE0 (bits 5 - 7 only)
-static int16_t deltaX, deltaY;
-static uint32_t Shutter;
-static volatile bool motionDetect;
-static uint8_t statusCheck;
-static uint8_t frameArray[1225], dataArray[14], SQUAL, RawDataSum, RawDataMin, RawDataMax;
+
+// for X invert 0x80, for Y invert 0x40, for X and Y swap, 0x20, for all three 0XE0 (bits 5 - 7 only)
+static uint8_t ORIENTATION = 0x00;
 
 static PAA3905 sensor(CS_PIN);
 
+static volatile bool motionDetect;
 static void interruptHandler()
 {
     motionDetect = true;
@@ -86,8 +84,8 @@ void setup()
     resolution = (sensor.getResolution() + 1) * 200.0f/8600.0f; // == 1 if pixelRes == 0x2A
     Debugger::printf("Resolution is: %f CPI per meter height", resolution * 11.914f, 1);
 
-    sensor.setOrientation(orient);
-    orientation = sensor.getOrientation();
+    sensor.setOrientation(ORIENTATION);
+    uint8_t orientation = sensor.getOrientation();
     if (orientation & 0x80) {
         Debugger::printf("X direction inverted!\n");
     }
@@ -100,7 +98,7 @@ void setup()
 
     attachInterrupt(MOT_PIN, interruptHandler, FALLING); // data ready interrupt active LOW 
 
-    statusCheck = sensor.status();          // clear interrupt before entering main loop
+    sensor.status();          // clear interrupt before entering main loop
 
     //  sensor.shutdown();                    // enter lowest power mode until ready to use
 
@@ -108,6 +106,8 @@ void setup()
 
 void loop() {
 
+    static uint8_t frameArray[1225];
+    static uint8_t dataArray[14];
     static uint8_t iterations;
 
     iterations++;
@@ -124,13 +124,13 @@ void loop() {
             Debugger::printf("Challenging surface detected!\n");
         }
 
-        deltaX = ((int16_t)dataArray[3] << 8) | dataArray[2];
-        deltaY = ((int16_t)dataArray[5] << 8) | dataArray[4];
-        SQUAL = dataArray[7];      // surface quality
-        RawDataSum = dataArray[8];
-        RawDataMax = dataArray[9];
-        RawDataMin = dataArray[10];
-        Shutter = ((uint32_t)dataArray[11] << 16) | ((uint32_t)dataArray[12] << 8) | dataArray[13];
+        uint16_t deltaX = ((int16_t)dataArray[3] << 8) | dataArray[2];
+        uint16_t deltaY = ((int16_t)dataArray[5] << 8) | dataArray[4];
+        uint8_t SQUAL = dataArray[7];      // surface quality
+        uint8_t RawDataSum = dataArray[8];
+        uint8_t RawDataMax = dataArray[9];
+        uint8_t RawDataMin = dataArray[10];
+        uint32_t Shutter = ((uint32_t)dataArray[11] << 16) | ((uint32_t)dataArray[12] << 8) | dataArray[13];
         Shutter &= 0x7FFFFF; // 23-bit positive integer 
 
         //   mode =    sensor.getMode();
@@ -194,8 +194,8 @@ void loop() {
         delay(50);
         sensor.setMode(mode, autoMode);         // set modes
         sensor.setResolution(pixelRes);         // set resolution fraction of default 0x2A
-        sensor.setOrientation(orient);          // set orientation
-        statusCheck = sensor.status();          // clear interrupt before entering main loop
+        sensor.setOrientation(ORIENTATION);     // set orientation
+        sensor.status();          // clear interrupt before entering main loop
         Debugger::printf("Back in Navigation mode!\n");
     }
 
