@@ -38,15 +38,11 @@
 static const uint8_t CS_PIN  = 10;  // default chip select for SPI
 static const uint8_t MOT_PIN =  8;  // use as data ready interrupt
 
-// PAA3905 configuration
-PAA3905::detection_mode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
-
-static uint8_t autoMode = autoMode01;        // choices are autoMode01 and autoMode012 (includes superLowLight mode)
-
-static uint8_t RESOLUTION = 0x2A;  // choices are from 0x00 to 0xFF
-
-// for X invert 0x80, for Y invert 0x40, for X and Y swap, 0x20, for all three 0XE0 (bits 5 - 7 only)
-static uint8_t ORIENTATION = 0x00;
+// Sensor configuration
+static PAA3905::detection_mode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
+static PAA3905::auto_mode_t AUTO_MODE = PAA3905::AUTO_MODE_01; 
+static uint8_t RESOLUTION = 0x2A;
+static uint8_t ORIENTATION = 0x00;// for X invert 0x80, for Y invert 0x40, for X and Y swap, 0x20, for all three 0XE0 (bits 5 - 7 only)
 
 static PAA3905 sensor(CS_PIN);
 
@@ -79,7 +75,7 @@ void setup()
 
     sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
 
-    sensor.setMode(DETECTION_MODE, autoMode);         // set modes
+    sensor.setMode(DETECTION_MODE, AUTO_MODE);         // set modes
 
     sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
     float resolution = (sensor.getResolution() + 1) * 200.0f/8600.0f; // == 1 if RESOLUTION == 0x2A
@@ -193,7 +189,7 @@ void loop() {
         // Return to navigation mode
         sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
         delay(50);
-        sensor.setMode(DETECTION_MODE, autoMode);         // set modes
+        sensor.setMode(DETECTION_MODE, AUTO_MODE);         // set modes
         sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
         sensor.setOrientation(ORIENTATION);     // set orientation
         sensor.status();          // clear interrupt before entering main loop

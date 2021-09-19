@@ -35,7 +35,7 @@ void PAA3905::setMode(uint8_t mode, uint8_t autoMode)
     reset();
     initRegisters(mode);
 
-    if(autoMode == autoMode012){
+    if(autoMode == AUTO_MODE_012) {
         writeByteDelay(0x7F, 0x08);
         writeByteDelay(0x68, 0x02);
         writeByteDelay(0x7F, 0x00);
@@ -239,7 +239,7 @@ uint8_t PAA3905::readByte(uint8_t reg)
 void PAA3905::enterFrameCaptureMode()
 {
     // make sure not in superlowlight mode for frame capture
-    setMode(DETECTION_STANDARD, autoMode01); 
+    setMode(DETECTION_STANDARD, AUTO_MODE_01); 
 
     writeByteDelay(0x7F, 0x00);
     writeByteDelay(0x67, 0x25);
