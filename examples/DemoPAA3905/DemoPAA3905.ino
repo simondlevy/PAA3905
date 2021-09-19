@@ -1,7 +1,6 @@
 /*
    Demo of the PAA3905 optical flow sensor
 
-
    This sketch configures and reads data from the PAA3905 optical flow sensor. 
    The sensor uses standard SPI for communications at a maximum serial port
    speed of 2 MHz. The sensor data ready is signaled by an active LOW
@@ -84,13 +83,13 @@ void setup()
 
     sensor.setOrientation(ORIENTATION);
     uint8_t orientation = sensor.getOrientation();
-    if (orientation & 0x80) {
+    if (orientation & PAA3905::ORIENTATION_XINVERT) {
         Debugger::printf("X direction inverted!\n");
     }
-    if (orientation & 0x40) {
+    if (orientation & PAA3905::ORIENTATION_YINVERT) {
         Debugger::printf("Y direction inverted!\n");
     }
-    if (orientation & 0x20) {
+    if (orientation & PAA3905::ORIENTATION_SWAP) {
         Debugger::printf("X and Y swapped!\n");
     }
 
