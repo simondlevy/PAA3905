@@ -40,9 +40,9 @@ static const uint8_t MOT_PIN =  8;  // use as data ready interrupt
 
 // Sensor configuration
 static PAA3905::detection_mode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
-static PAA3905::auto_mode_t AUTO_MODE           = PAA3905::AUTO_MODE_01; 
-static PAA3905::orientation_t ORIENTATION       = PAA3905::ORIENTATION_NORMAL;
-static uint8_t RESOLUTION                       = 0x2A;
+static PAA3905::auto_mode_t      AUTO_MODE      = PAA3905::AUTO_MODE_01; 
+static PAA3905::orientation_t    ORIENTATION    = PAA3905::ORIENTATION_NORMAL;
+static uint8_t                   RESOLUTION     = 0x2A;
 
 static PAA3905 sensor(CS_PIN);
 
@@ -73,13 +73,14 @@ void setup()
         Debugger::reportForever("Initialization of the sensor sensor failed");
     }
 
-    sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
+    // Reset PAA3905 to return all registers to default before configuring
+    sensor.reset(); 
 
-    sensor.setMode(DETECTION_MODE, AUTO_MODE);         // set modes
+    sensor.setMode(DETECTION_MODE, AUTO_MODE); 
 
-    sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
-    float resolution = (sensor.getResolution() + 1) * 200.0f/8600.0f; // == 1 if RESOLUTION == 0x2A
-    Debugger::printf("Resolution is: %f CPI per meter height", resolution * 11.914f, 1);
+    sensor.setResolution(RESOLUTION);         
+    float resolution = (sensor.getResolution() + 1) * 200.0f/8600.0f; 
+    Debugger::printf("Resolution is: %f CPI per meter height", resolution * 11.914f);
 
     sensor.setOrientation(ORIENTATION);
     uint8_t orientation = sensor.getOrientation();
