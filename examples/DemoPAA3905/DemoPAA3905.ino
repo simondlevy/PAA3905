@@ -25,7 +25,7 @@
    pixel images from the sensor at a frame rate of ~15 Hz. This makes the PAA3905
    an inexpensive, low-resolution, infrared-sensitive video camera.
 
-   Copyright (c) 2021 Kris Winer and Simon D. Levy
+   Copyright (c) 2021 Tlera Corporiation and Simon D. Levy
 
    MIT License
 
