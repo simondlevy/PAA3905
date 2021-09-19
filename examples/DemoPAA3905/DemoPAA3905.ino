@@ -52,7 +52,12 @@ static uint8_t frameArray[1225], dataArray[14], SQUAL, RawDataSum, RawDataMin, R
 static uint8_t iterations;
 static uint32_t frameTime;
 
-static PAA3905 opticalFlow(CS_PIN); // Instantiate PAA3905
+static PAA3905 sensor(CS_PIN);
+
+static void interruptHandler()
+{
+    motionDetect = true;
+}
 
 void setup() 
 {
@@ -68,23 +73,23 @@ void setup()
     SPI.begin(); // initiate SPI 
     delay(1000);
 
-    opticalFlow.begin();  // Prepare SPI port 
+    sensor.begin();  // Prepare SPI port 
 
     // Check device ID as a test of SPI communications
-    if (!opticalFlow.checkID()) {
-        Debugger::reportForever("Initialization of the opticalFlow sensor failed");
+    if (!sensor.checkID()) {
+        Debugger::reportForever("Initialization of the sensor sensor failed");
     }
 
-    opticalFlow.reset(); // Reset PAA3905 to return all registers to default before configuring
+    sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
 
-    opticalFlow.setMode(mode, autoMode);         // set modes
+    sensor.setMode(mode, autoMode);         // set modes
 
-    opticalFlow.setResolution(pixelRes);         // set resolution fraction of default 0x2A
-    resolution = (opticalFlow.getResolution() + 1) * 200.0f/8600.0f; // == 1 if pixelRes == 0x2A
+    sensor.setResolution(pixelRes);         // set resolution fraction of default 0x2A
+    resolution = (sensor.getResolution() + 1) * 200.0f/8600.0f; // == 1 if pixelRes == 0x2A
     Debugger::printf("Resolution is: %f CPI per meter height", resolution * 11.914f, 1);
 
-    opticalFlow.setOrientation(orient);
-    orientation = opticalFlow.getOrientation();
+    sensor.setOrientation(orient);
+    orientation = sensor.getOrientation();
     if (orientation & 0x80) {
         Debugger::printf("X direction inverted!\n");
     }
@@ -95,11 +100,11 @@ void setup()
         Debugger::printf("X and Y swapped!\n");
     }
 
-    attachInterrupt(MOT_PIN, myIntHandler, FALLING); // data ready interrupt active LOW 
+    attachInterrupt(MOT_PIN, interruptHandler, FALLING); // data ready interrupt active LOW 
 
-    statusCheck = opticalFlow.status();          // clear interrupt before entering main loop
+    statusCheck = sensor.status();          // clear interrupt before entering main loop
 
-    //  opticalFlow.shutdown();                    // enter lowest power mode until ready to use
+    //  sensor.shutdown();                    // enter lowest power mode until ready to use
 
 } // setup
 
@@ -110,7 +115,7 @@ void loop() {
     // Navigation
     if (motionDetect){
         motionDetect = false;
-        opticalFlow.readBurstMode(dataArray); // use burst mode to read all of the data
+        sensor.readBurstMode(dataArray); // use burst mode to read all of the data
     }
 
     if (dataArray[0] & 0x80) {   // Check if motion data available
@@ -128,7 +133,7 @@ void loop() {
         Shutter = ((uint32_t)dataArray[11] << 16) | ((uint32_t)dataArray[12] << 8) | dataArray[13];
         Shutter &= 0x7FFFFF; // 23-bit positive integer 
 
-        //   mode =    opticalFlow.getMode();
+        //   mode =    sensor.getMode();
         mode = (dataArray[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
         // Don't report data if under thresholds
         if ((mode == bright       ) && (SQUAL < 25) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
@@ -165,9 +170,9 @@ void loop() {
         delay(4000);
 
         frameTime = millis();
-        opticalFlow.enterFrameCaptureMode();   
-        opticalFlow.captureFrame(frameArray);
-        opticalFlow.exitFrameCaptureMode(); // exit fram capture mode
+        sensor.enterFrameCaptureMode();   
+        sensor.captureFrame(frameArray);
+        sensor.exitFrameCaptureMode(); // exit fram capture mode
         Serial.print("Frame time = "); Serial.print(millis() - frameTime); Serial.println(" ms"); Serial.println(" ");
 
         for (uint8_t ii = 0; ii < 35; ii++) { // plot the frame data on the serial monitor (TFT display would be better)
@@ -181,25 +186,19 @@ void loop() {
         }
         Serial.println(" ");
 
-        opticalFlow.exitFrameCaptureMode(); // exit fram capture mode
-        Serial.print("Frame time = "); Serial.print(millis() - frameTime); Serial.println(" ms"); Serial.println(" ");
+        sensor.exitFrameCaptureMode(); // exit fram capture mode
+        Debugger::printf("Frame time = %d ms\n", millis() - frameTime);
 
         // Return to navigation mode
-        opticalFlow.reset(); // Reset PAA3905 to return all registers to default before configuring
+        sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
         delay(50);
-        opticalFlow.setMode(mode, autoMode);         // set modes
-        opticalFlow.setResolution(pixelRes);         // set resolution fraction of default 0x2A
-        opticalFlow.setOrientation(orient);          // set orientation
-        statusCheck = opticalFlow.status();          // clear interrupt before entering main loop
-        Serial.println("Back in Navigation mode!");
+        sensor.setMode(mode, autoMode);         // set modes
+        sensor.setResolution(pixelRes);         // set resolution fraction of default 0x2A
+        sensor.setOrientation(orient);          // set orientation
+        statusCheck = sensor.status();          // clear interrupt before entering main loop
+        Debugger::printf("Back in Navigation mode!\n");
     }
 
     delay(50); // limit reporting to 20 Hz
 
-    } // end of main loop
-
-
-    void myIntHandler()
-    {
-        motionDetect = true;
-    }
+    } // loop
