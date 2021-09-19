@@ -43,9 +43,7 @@ PAA3905::detection_mode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
 
 static uint8_t autoMode = autoMode01;        // choices are autoMode01 and autoMode012 (includes superLowLight mode)
 
-static uint8_t pixelRes = 0x2A;  // choices are from 0x00 to 0xFF
-
-static float resolution;         // calculated (approximate) resolution (counts per delta) per meter of height
+static uint8_t RESOLUTION = 0x2A;  // choices are from 0x00 to 0xFF
 
 // for X invert 0x80, for Y invert 0x40, for X and Y swap, 0x20, for all three 0XE0 (bits 5 - 7 only)
 static uint8_t ORIENTATION = 0x00;
@@ -83,8 +81,8 @@ void setup()
 
     sensor.setMode(DETECTION_MODE, autoMode);         // set modes
 
-    sensor.setResolution(pixelRes);         // set resolution fraction of default 0x2A
-    resolution = (sensor.getResolution() + 1) * 200.0f/8600.0f; // == 1 if pixelRes == 0x2A
+    sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
+    float resolution = (sensor.getResolution() + 1) * 200.0f/8600.0f; // == 1 if RESOLUTION == 0x2A
     Debugger::printf("Resolution is: %f CPI per meter height", resolution * 11.914f, 1);
 
     sensor.setOrientation(ORIENTATION);
@@ -196,7 +194,7 @@ void loop() {
         sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
         delay(50);
         sensor.setMode(DETECTION_MODE, autoMode);         // set modes
-        sensor.setResolution(pixelRes);         // set resolution fraction of default 0x2A
+        sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
         sensor.setOrientation(ORIENTATION);     // set orientation
         sensor.status();          // clear interrupt before entering main loop
         Debugger::printf("Back in Navigation mode!\n");
