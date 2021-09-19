@@ -9,9 +9,6 @@
 
 #include <Arduino.h>
 
-#define standardDetectionMode      0
-#define enhancedDetectionMode      1
-
 #define autoMode012       0
 #define autoMode01        1
 
