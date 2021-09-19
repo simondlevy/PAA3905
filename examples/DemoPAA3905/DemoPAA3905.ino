@@ -34,36 +34,36 @@
 #include "PAA3905.h"
 
 // Pin definitions
-#define CSPIN  10  // default chip select for SPI
-#define MOSI   11  // SPI MOSI pin on Ladybug required for frame capture
-#define MOT     8  // use as data ready interrupt
+static const uint8_t CS_PIN  = 10;  // default chip select for SPI
+static const uint8_t MOT_PIN =  8;  // use as data ready interrupt
 
 // PAA3905 configuration
-uint8_t mode = standardDetectionMode; // mode choices are standardDetectionMode (default) or enhancedDetectionMode
-uint8_t autoMode = autoMode01;        // choices are autoMode01 and autoMode012 (includes superLowLight mode)
-uint8_t pixelRes = 0x2A;  // choices are from 0x00 to 0xFF
-float resolution;         // calculated (approximate) resolution (counts per delta) per meter of height
-uint8_t orientation, orient = 0x00; // for X invert 0x80, for Y invert 0x40, for X and Y swap, 0x20, for all three 0XE0 (bits 5 - 7 only)
-int16_t deltaX = 0, deltaY = 0;
-uint32_t Shutter = 0;
-volatile bool motionDetect = false;
-uint8_t statusCheck = 0;
-uint8_t frameArray[1225], dataArray[14], SQUAL, RawDataSum = 0, RawDataMin = 0, RawDataMax = 0;
-uint8_t iterations = 0;
-uint32_t frameTime = 0;
+static uint8_t mode = standardDetectionMode; // mode choices are standardDetectionMode (default) or enhancedDetectionMode
+static uint8_t autoMode = autoMode01;        // choices are autoMode01 and autoMode012 (includes superLowLight mode)
+static uint8_t pixelRes = 0x2A;  // choices are from 0x00 to 0xFF
+static float resolution;         // calculated (approximate) resolution (counts per delta) per meter of height
+static uint8_t orientation, orient; // for X invert 0x80, for Y invert 0x40, for X and Y swap, 0x20, for all three 0XE0 (bits 5 - 7 only)
+static int16_t deltaX, deltaY;
+static uint32_t Shutter;
+static volatile bool motionDetect;
+static uint8_t statusCheck;
+static uint8_t frameArray[1225], dataArray[14], SQUAL, RawDataSum, RawDataMin, RawDataMax;
+static uint8_t iterations;
+static uint32_t frameTime;
 
-PAA3905 opticalFlow(CSPIN); // Instantiate PAA3905
+static PAA3905 opticalFlow(CS_PIN); // Instantiate PAA3905
 
-void setup() {
+void setup() 
+{
     Serial.begin(115200);
     delay(4000);
     Serial.println("Serial enabled!");
 
-    pinMode(MOT, INPUT); // data ready interrupt
+    pinMode(MOT_PIN, INPUT); // data ready interrupt
 
     // Configure SPI Flash chip select
-    pinMode(CSPIN, OUTPUT);
-    digitalWrite(CSPIN, HIGH);
+    pinMode(CS_PIN, OUTPUT);
+    digitalWrite(CS_PIN, HIGH);
 
     SPI.begin(); // initiate SPI 
     delay(1000);
@@ -90,7 +90,7 @@ void setup() {
     if(orientation & 0x40) Serial.println("Y direction inverted!"); Serial.println(" ");
     if(orientation & 0x20) Serial.println("X and Y swapped!"); Serial.println(" ");
 
-    attachInterrupt(MOT, myIntHandler, FALLING); // data ready interrupt active LOW 
+    attachInterrupt(MOT_PIN, myIntHandler, FALLING); // data ready interrupt active LOW 
 
     statusCheck = opticalFlow.status();          // clear interrupt before entering main loop
 
