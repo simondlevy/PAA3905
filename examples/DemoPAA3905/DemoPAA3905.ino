@@ -32,6 +32,7 @@
  */
 #include <SPI.h>
 #include "PAA3905.h"
+#include "Debugger.hpp"
 
 // Pin definitions
 static const uint8_t CS_PIN  = 10;  // default chip select for SPI
@@ -57,7 +58,6 @@ void setup()
 {
     Serial.begin(115200);
     delay(4000);
-    Serial.println("Serial enabled!");
 
     pinMode(MOT_PIN, INPUT); // data ready interrupt
 
@@ -72,8 +72,7 @@ void setup()
 
     // Check device ID as a test of SPI communications
     if (!opticalFlow.checkID()) {
-        Serial.println("Initialization of the opticalFlow sensor failed");
-        while(1) { }
+        Debugger::reportForever("Initialization of the opticalFlow sensor failed");
     }
 
     opticalFlow.reset(); // Reset PAA3905 to return all registers to default before configuring
@@ -82,40 +81,43 @@ void setup()
 
     opticalFlow.setResolution(pixelRes);         // set resolution fraction of default 0x2A
     resolution = (opticalFlow.getResolution() + 1) * 200.0f/8600.0f; // == 1 if pixelRes == 0x2A
-    Serial.print("Resolution is: "); Serial.print(resolution * 11.914f, 1); Serial.println(" CPI per meter height"); Serial.println(" ");
+    Debugger::printf("Resolution is: %f CPI per meter height", resolution * 11.914f, 1);
 
     opticalFlow.setOrientation(orient);
     orientation = opticalFlow.getOrientation();
-    if(orientation & 0x80) Serial.println("X direction inverted!"); Serial.println(" ");
-    if(orientation & 0x40) Serial.println("Y direction inverted!"); Serial.println(" ");
-    if(orientation & 0x20) Serial.println("X and Y swapped!"); Serial.println(" ");
+    if (orientation & 0x80) {
+        Debugger::printf("X direction inverted!\n");
+    }
+    if (orientation & 0x40) {
+        Debugger::printf("Y direction inverted!\n");
+    }
+    if (orientation & 0x20) {
+        Debugger::printf("X and Y swapped!\n");
+    }
 
     attachInterrupt(MOT_PIN, myIntHandler, FALLING); // data ready interrupt active LOW 
 
     statusCheck = opticalFlow.status();          // clear interrupt before entering main loop
 
     //  opticalFlow.shutdown();                    // enter lowest power mode until ready to use
-    /* end of setup */
-}
+
+} // setup
 
 void loop() {
 
     iterations++;
 
     // Navigation
-    if(motionDetect){
+    if (motionDetect){
         motionDetect = false;
-
-        //   statusCheck = opticalFlow.status(); // clear interrupt
-        //   if(statusCheck & 0x01) Serial.println("Challenging surface detected!");
-        //   if(statusCheck & 0x80) { //Check that motion data is available
-        //   opticalFlow.readMotionCount(&deltaX, &deltaY, &SQUAL, &Shutter);  // read some of the data
         opticalFlow.readBurstMode(dataArray); // use burst mode to read all of the data
     }
 
-    if(dataArray[0] & 0x80) {   // Check if motion data available
+    if (dataArray[0] & 0x80) {   // Check if motion data available
 
-        if(dataArray[0]  & 0x01) Serial.println("Challenging surface detected!");
+        if (dataArray[0]  & 0x01) {
+            Debugger::printf("Challenging surface detected!\n");
+        }
 
         deltaX = ((int16_t)dataArray[3] << 8) | dataArray[2];
         deltaY = ((int16_t)dataArray[5] << 8) | dataArray[4];
@@ -129,27 +131,35 @@ void loop() {
         //   mode =    opticalFlow.getMode();
         mode = (dataArray[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
         // Don't report data if under thresholds
-        if((mode == bright       ) && (SQUAL < 25) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if((mode == lowlight     ) && (SQUAL < 70) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if((mode == superlowlight) && (SQUAL < 85) && (Shutter >= 0x025998)) deltaX = deltaY = 0;
+        if ((mode == bright       ) && (SQUAL < 25) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
+        if ((mode == lowlight     ) && (SQUAL < 70) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
+        if ((mode == superlowlight) && (SQUAL < 85) && (Shutter >= 0x025998)) deltaX = deltaY = 0;
 
         // Report mode
-        if(mode == bright)        Serial.println("Bright Mode"); 
-        if(mode == lowlight)      Serial.println("Low Light Mode"); 
-        if(mode == superlowlight) Serial.println("Super Low Light Mode"); 
-        if(mode == unknown)       Serial.println("Unknown Mode"); 
+        switch (mode) {
+            case bright:
+                Debugger::printf("Bright Mode\n");
+                break;
+            case lowlight:
+                Debugger::printf("Low Light Mode\n");
+                break;
+            case superlowlight:
+                Debugger::printf("Super Low Light Mode\n");
+                break;
+            default:
+                Debugger::printf("Unknown Mode\n");
+        }
 
         // Data and Diagnostics output
-        Serial.print("X: ");Serial.print(deltaX);Serial.print(", Y: ");Serial.println(deltaY);
-        Serial.print("Number of Valid Features: ");Serial.print(4*SQUAL);
-        Serial.print(", Shutter: 0x");Serial.println(Shutter, HEX);
-        Serial.print("Max Raw Data: ");Serial.print(RawDataMax);Serial.print(", Min Raw Data: ");Serial.print(RawDataMin);
-        Serial.print(", Avg Raw Data: ");Serial.println(RawDataSum); Serial.println(" ");
+        Debugger::printf("X: %d , Y: %d\n", deltaX, deltaY);
+        Debugger::printf("Number of Valid Features: %d, Shutter: 0x%02X\n", 4*SQUAL, Shutter);
+        Debugger::printf("Max Raw Data: %d, Min Raw Data: %d, Avg RawData: %d\n\n",
+                RawDataMax, RawDataMin, RawDataSum);
     }
 
     // Frame capture
-    if(iterations >= 100) // capture one frame per 100 iterations (~5 sec) of navigation
-    {
+    if (iterations >= 100) { // capture one frame per 100 iterations (~5 sec) of navigation
+    
         iterations = 0;
         Serial.println("Hold camera still for frame capture!");
         delay(4000);
@@ -160,11 +170,10 @@ void loop() {
         opticalFlow.exitFrameCaptureMode(); // exit fram capture mode
         Serial.print("Frame time = "); Serial.print(millis() - frameTime); Serial.println(" ms"); Serial.println(" ");
 
-        for(uint8_t ii = 0; ii < 35; ii++) // plot the frame data on the serial monitor (TFT display would be better)
-        {
+        for (uint8_t ii = 0; ii < 35; ii++) { // plot the frame data on the serial monitor (TFT display would be better)
+        
             Serial.print(ii); Serial.print(" "); 
-            for(uint8_t jj = 0; jj < 35; jj++)
-            {
+            for (uint8_t jj = 0; jj < 35; jj++) {
                 Serial.print(frameArray[ii*35 + jj]); Serial.print(" ");  
             }
             Serial.println(" ");
@@ -184,7 +193,6 @@ void loop() {
         Serial.println("Back in Navigation mode!");
     }
 
-    //  STM32L4.sleep();
     delay(50); // limit reporting to 20 Hz
 
     } // end of main loop
