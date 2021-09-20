@@ -13,7 +13,7 @@ PAA3905::PAA3905(uint8_t cspin)
 { }
 
 
-boolean PAA3905::begin(void) 
+void PAA3905::begin(void) 
 {
     // Setup SPI port
     SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3)); // 2 MHz max SPI clock frequency
@@ -226,11 +226,12 @@ void PAA3905::enterFrameCaptureMode()
 }
 
 
-uint8_t PAA3905::captureFrame(uint8_t * frameArray)
+void PAA3905::captureFrame(uint8_t * frameArray)
 {  
+    // wait for grab status bit 0 to equal 1
     uint8_t tempStatus = 0;
     while( !(tempStatus & 0x01) ) {
-        tempStatus = readByte(PAA3905_RAWDATA_GRAB_STATUS); // wait for grab status bit 0 to equal 1
+        tempStatus = readByte(PAA3905_RAWDATA_GRAB_STATUS); 
     } 
 
     writeByteDelay(PAA3905_RAWDATA_GRAB, 0xFF); // start frame capture mode
@@ -239,7 +240,7 @@ uint8_t PAA3905::captureFrame(uint8_t * frameArray)
     {
         for(uint8_t jj = 0; jj < 35; jj++)
         {
-            frameArray[ii*35 + jj] = readByte(PAA3905_RAWDATA_GRAB); // read the 1225 data into array
+            frameArray[ii*35 + jj] = readByte(PAA3905_RAWDATA_GRAB);
         }
     }
 }
@@ -384,8 +385,8 @@ void PAA3905::enhancedDetection()
     writeByteDelay(0x4A, 0x1E);
     writeByteDelay(0x4B, 0x1E); // 50
 
-    writeByteDelay(0x4C, 0x34C); // 51 
-    writeByteDelay(0x4D, 0x34C);  
+    writeByteDelay(0x4C, 0x34); // 51 
+    writeByteDelay(0x4D, 0x34);  
     writeByteDelay(0x46, 0x32);
     writeByteDelay(0x59, 0x0D);
     writeByteDelay(0x7F, 0x0A);

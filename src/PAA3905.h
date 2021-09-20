@@ -39,7 +39,7 @@ class PAA3905 {
 
         PAA3905(uint8_t cspin);
 
-        boolean begin(void);
+        void begin(void);
 
         uint8_t status();
 
@@ -87,7 +87,7 @@ class PAA3905 {
 
         void enterFrameCaptureMode();
 
-        uint8_t captureFrame(uint8_t * frameArray);
+        void captureFrame(uint8_t * frameArray);
 
         void exitFrameCaptureMode();
 
