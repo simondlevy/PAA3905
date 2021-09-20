@@ -32,28 +32,39 @@
 #include <SPI.h>
 #include "PAA3905.h"
 
-// Pin definitions
 #define CSPIN  10  // default chip select for SPI
 #define MOSI   11  // SPI MOSI pin on Ladybug required for frame capture
 #define MOT     8  // use as data ready interrupt
 
 // PAA3905 configuration
 
-static PAA3905::detection_mode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
+static const PAA3905::detection_mode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
 
-static uint8_t autoMode = autoMode01;        
-static uint8_t pixelRes = 0x2A;  
-static float resolution;        
-static uint8_t orientation, orient; 
+static const PAA3905::auto_mode_t AUTO_MODE = PAA3905::AUTO_MODE_01;
+
+static const uint8_t ORIENTATION = 0X00; 
+
+static uint8_t pixelRes = 0x2A; // 0x00 to 0xFF
+
 static int16_t deltaX, deltaY;
+
 static uint32_t Shutter;
-static volatile bool motionDetect;
+
 static uint8_t statusCheck;
+
 static uint8_t frameArray[1225], dataArray[14], SQUAL, RawDataSum = 0, RawDataMin = 0, RawDataMax = 0;
+
 static uint8_t iterations;
+
 static uint32_t frameTime;
 
 PAA3905 opticalFlow(CSPIN); // Instantiate PAA3905
+
+static volatile bool motionDetect;
+void myIntHandler()
+{
+    motionDetect = true;
+}
 
 void setup() 
 {
@@ -80,14 +91,14 @@ void setup()
 
     opticalFlow.reset(); // Reset PAA3905 to return all registers to default before configuring
 
-    opticalFlow.setMode(DETECTION_MODE, autoMode);         // set modes
+    opticalFlow.setMode(DETECTION_MODE, AUTO_MODE);         // set modes
 
     opticalFlow.setResolution(pixelRes);         // set resolution fraction of default 0x2A
-    resolution = (opticalFlow.getResolution() + 1) * 200.0f/8600.0f; // == 1 if pixelRes == 0x2A
+    float resolution = (opticalFlow.getResolution() + 1) * 200.0f/8600.0f; // == 1 if pixelRes == 0x2A
     Serial.print("Resolution is: "); Serial.print(resolution * 11.914f, 1); Serial.println(" CPI per meter height"); Serial.println(" ");
 
-    opticalFlow.setOrientation(orient);
-    orientation = opticalFlow.getOrientation();
+    opticalFlow.setOrientation(ORIENTATION);
+    uint8_t orientation = opticalFlow.getOrientation();
     if(orientation & 0x80) Serial.println("X direction inverted!"); Serial.println(" ");
     if(orientation & 0x40) Serial.println("Y direction inverted!"); Serial.println(" ");
     if(orientation & 0x20) Serial.println("X and Y swapped!"); Serial.println(" ");
@@ -178,9 +189,9 @@ void loop()
         // Return to navigation mode
         opticalFlow.reset(); // Reset PAA3905 to return all registers to default before configuring
         delay(50);
-        opticalFlow.setMode(mode, autoMode);         // set modes
+        opticalFlow.setMode(mode, AUTO_MODE);         // set modes
         opticalFlow.setResolution(pixelRes);         // set resolution fraction of default 0x2A
-        opticalFlow.setOrientation(orient);          // set orientation
+        opticalFlow.setOrientation(ORIENTATION);
         statusCheck = opticalFlow.status();          // clear interrupt before entering main loop
         Serial.println("Back in Navigation mode!");
     }
@@ -191,7 +202,3 @@ void loop()
     } // end of main loop
 
 
-    void myIntHandler()
-    {
-        motionDetect = true;
-    }

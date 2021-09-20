@@ -26,6 +26,10 @@ class PAA3905 {
             DETECTION_ENHANCED
         } detection_mode_t;
 
+        typedef enum {
+            AUTO_MODE_01,
+            AUTO_MODE_012,
+        } auto_mode_t;
 
         PAA3905(uint8_t cspin);
         void begin(void);
