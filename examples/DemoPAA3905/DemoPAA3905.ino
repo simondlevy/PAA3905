@@ -1,48 +1,34 @@
-/* 08/25/2021 Copyright Tlera Corporation
- *  
- *  Created by Kris Winer
- *  
- This sketch configures and reads data from the PAA3905 optical flow sensor. 
- The sensor uses standard SPI for communications at a maximum serial port speed of 2 MHz. The sensor data ready
- is signaled by an active LOW interrupt.
+/*
+   Demo of the PAA3905 optical flow sensor
 
- This sensor offers two sensitivities: standard detection and enhanced detection for rough terrain 
- at > 15 cm height. The sensor can automatically switch between bright (>60 lux), low light (>30 lux), 
- and super low light (> 5 lux) conditions. Bright and low light modes work at 126 frames per second. The super 
- low light mode is limited to 50 frames per second. 
+   This sketch configures and reads data from the PAA3905 optical flow sensor.
+   The sensor uses standard SPI for communications at a maximum serial port
+   speed of 2 MHz. The sensor data ready is signaled by an active LOW
+   interrupt.
 
- The sensor uses typically 3.5 mA in operation and has a 12 uA shutdown mode The sensor can operate 
- in navigate mode producing delta X and Y values which are proportional to lateral velocity. 
- The limiting speed is determined by the maximum 7.2 rads/sec flow rate and by distance to the measurement 
- surface; 80 mm is the minimum measurement distance. So at 80 mm the maxium speed is 0.576 m/s (1.25 mph), 
- at 2 meter distance (~drone height) the maximum speed is 14.4 m/s (32 mph), etc. 
+   This sensor offers two sensitivities: standard detection and enhanced
+   detection for rough terrain at > 15 cm height. The sensor can automatically
+   switch between bright (>60 lux), low light (>30 lux), and super low light (> 5
+   lux) conditions. Bright and low light modes work at 126 frames per second. The
+   super low light mode is limited to 50 frames per second.
 
- The sensor can also operate in raw data (frame grab) mode producing 35 x 35 pixel images from the 
- sensor at a frame rate of ~15 Hz. This makes the PAA3905 an inexpensive, low-resolution, infrared-sensitive 
- video camera.
+   The sensor uses typically 3.5 mA in operation and has a 12 uA shutdown mode.
 
- The sketch uses default SPI pins on the Ladybug development board.
+   The sensor can operate in navigate mode producing delta X and Y values which
+   are proportional to lateral velocity.  The limiting speed is determined by the
+   maximum 7.2 rads/sec flow rate and by distance to the measurement surface; 80
+   mm is the minimum measurement distance. So at 80 mm the maxium speed is 0.576
+   m/s (1.25 mph), at 2 meter distance (~drone height) the maximum speed is 14.4
+   m/s (32 mph), etc.
 
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
+   The sensor can also operate in raw data (frame grab) mode producing 35 x 35
+   pixel images from the sensor at a frame rate of ~15 Hz. This makes the PAA3905
+   an inexpensive, low-resolution, infrared-sensitive video camera.
+   Copyright (c) 2021 Tlera Corporiation and Simon D. Levy
 
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- SOFTWARE.
-
- Library may be used freely and without limit with proper attribution including this entire preamble.
+   MIT License
  */
+
 #include <SPI.h>
 #include "PAA3905.h"
 
@@ -55,24 +41,25 @@
 
 static PAA3905::detection_mode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
 
-uint8_t autoMode = autoMode01;        // choices are autoMode01 and autoMode012 (includes superLowLight mode)
-uint8_t pixelRes = 0x2A;  // choices are from 0x00 to 0xFF
-float resolution;         // calculated (approximate) resolution (counts per delta) per meter of height
-uint8_t orientation, orient = 0x00; // for X invert 0x80, for Y invert 0x40, for X and Y swap, 0x20, for all three 0XE0 (bits 5 - 7 only)
-int16_t deltaX = 0, deltaY = 0;
-uint32_t Shutter = 0;
-volatile bool motionDetect = false;
-uint8_t statusCheck = 0;
-uint8_t frameArray[1225], dataArray[14], SQUAL, RawDataSum = 0, RawDataMin = 0, RawDataMax = 0;
-uint8_t iterations = 0;
-uint32_t frameTime = 0;
+static uint8_t autoMode = autoMode01;        
+static uint8_t pixelRes = 0x2A;  
+static float resolution;        
+static uint8_t orientation, orient; 
+static int16_t deltaX, deltaY;
+static uint32_t Shutter;
+static volatile bool motionDetect;
+static uint8_t statusCheck;
+static uint8_t frameArray[1225], dataArray[14], SQUAL, RawDataSum = 0, RawDataMin = 0, RawDataMax = 0;
+static uint8_t iterations;
+static uint32_t frameTime;
 
 PAA3905 opticalFlow(CSPIN); // Instantiate PAA3905
 
-void setup() {
+void setup() 
+{
     Serial.begin(115200);
+
     delay(4000);
-    Serial.println("Serial enabled!");
 
     pinMode(MOT, INPUT); // data ready interrupt
 
@@ -109,12 +96,10 @@ void setup() {
 
     statusCheck = opticalFlow.status();          // clear interrupt before entering main loop
 
-    //  opticalFlow.shutdown();                    // enter lowest power mode until ready to use
-    /* end of setup */
-}
+} // setup
 
-void loop() {
-
+void loop()
+{
     static uint8_t mode;
     iterations++;
 
