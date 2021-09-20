@@ -123,17 +123,11 @@ void loop() {
 
         uint16_t deltaX = sensor.getDeltaX();
         uint16_t deltaY = sensor.getDeltaY();
-        uint8_t squal = sensor.getSurfaceQuality();
+        uint8_t shutterQuality = sensor.getSurfaceQuality();
         uint8_t rawDataSum = sensor.getRawDataSum();
         uint8_t rawDataMax = sensor.getRawDataMax();
         uint8_t rawDataMin = sensor.getRawDataMin();
-        uint32_t shutter = sensor.getShutter(); // 23-bit positive integer 
         uint8_t lightMode = sensor.getLightMode();
-
-        // Don't report data if under thresholds
-        if ((lightMode == PAA3905::LIGHT_BRIGHT) && (squal < 25) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if ((lightMode == PAA3905::LIGHT_LOW) && (squal < 70) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if ((lightMode == PAA3905::LIGHT_SUPER_LOW) && (squal < 85) && (shutter >= 0x025998)) deltaX = deltaY = 0;
 
         // Report mode
         switch (lightMode) {
@@ -151,8 +145,17 @@ void loop() {
         }
 
         // Data and Diagnostics output
-        Debugger::printf("X: %d , Y: %d\n", deltaX, deltaY);
-        Debugger::printf("Number of Valid Features: %d, shutter: 0x%02X\n", 4*squal, shutter);
+
+        // Don't report data if under thresholds
+        if (sensor.goodQuality(lightMode, shutterQuality)) {
+            Debugger::printf("X: %d , Y: %d\n", deltaX, deltaY);
+        }
+
+        else {
+            Debugger::printf("Poor quality data; ignoring X,Y\n");
+        }
+
+        Debugger::printf("Number of Valid Features: %d\n", 4*shutterQuality);
         Debugger::printf("Max raw Data: %d, Min raw Data: %d, Avg rawData: %d\n\n",
                 rawDataMax, rawDataMin, rawDataSum);
     }

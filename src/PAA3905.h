@@ -63,8 +63,6 @@ class PAA3905 {
 
         uint8_t getRawDataMin(void);
 
-        uint32_t getShutter(void);
-
         uint8_t getLightMode(void);
 
         boolean checkID();
@@ -92,6 +90,8 @@ class PAA3905 {
         uint8_t captureFrame(uint8_t * frameArray);
 
         void exitFrameCaptureMode();
+
+        bool goodQuality(uint8_t lightMode, uint8_t shutterQuality);
 
     private:
 

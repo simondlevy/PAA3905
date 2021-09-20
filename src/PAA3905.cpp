@@ -436,16 +436,20 @@ uint8_t PAA3905::getRawDataMin(void)
     return _data[10];
 }
 
-uint32_t PAA3905::getShutter(void)
-{
-    // 23-bit positive integer 
-    return (((uint32_t)_data[11] << 16) |
-            ((uint32_t)_data[12] << 8) |
-            _data[13])
-           & 0x7FFFFF; 
-}
-
 uint8_t PAA3905::getLightMode(void)
 {
     return (_data[1] & 0xC0) >> 6;  
 }
+
+bool PAA3905::goodQuality(uint8_t lightMode, uint8_t shutterQuality)
+{
+    // 23-bit positive integer 
+    uint32_t sbits = (((uint32_t)_data[11] << 16) | ((uint32_t)_data[12] << 8) | _data[13]) & 0x7FFFFF; 
+
+    if ((lightMode == PAA3905::LIGHT_BRIGHT) && (shutterQuality < 25) && (sbits >= 0x00FF80)) return false;
+    if ((lightMode == PAA3905::LIGHT_LOW) && (shutterQuality < 70) && (sbits >= 0x00FF80)) return false;
+    if ((lightMode == PAA3905::LIGHT_SUPER_LOW) && (shutterQuality < 85) && (sbits >= 0x025998)) return false;
+
+    return true;
+}
+
