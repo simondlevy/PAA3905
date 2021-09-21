@@ -39,23 +39,39 @@ class PAA3905 {
         } orientation_t;
 
         PAA3905(uint8_t cspin);
-        void begin(void);
+
+        bool begin(void);
+
         uint8_t status();
+
         void initRegisters(uint8_t mode);
+
         void readMotionCount(int16_t *deltaX, int16_t *deltaY, uint8_t *SQUAL, uint32_t *Shutter);
+
         void readBurstMode(uint8_t * dataArray); 
-        boolean checkID();
+
         void setMode(uint8_t mode, uint8_t autoSwitch);
+
         void setOrientation(uint8_t orient);
+
         uint8_t getOrientation();
+
         void setResolution(uint8_t res);
+
         uint8_t getResolution();
+
         void reset();
+
         void shutdown();
+        
         void powerup();
+
         uint8_t getMode();
+
         void enterFrameCaptureMode();
+
         void captureFrame(uint8_t * frameArray);
+
         void exitFrameCaptureMode();
 
     private:

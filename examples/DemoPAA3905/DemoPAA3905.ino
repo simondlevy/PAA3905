@@ -32,6 +32,7 @@
 
 #include <SPI.h>
 #include "PAA3905.h"
+#include "Debugger.hpp"
 
 // Pins
 static const uint8_t CS_PIN  = 10; 
@@ -61,15 +62,13 @@ void setup()
     pinMode(CS_PIN, OUTPUT);
     digitalWrite(CS_PIN, HIGH);
 
-    SPI.begin(); // initiate SPI 
+    // Start SPI
+    SPI.begin();
     delay(1000);
 
-    sensor.begin();  // Prepare SPI port 
-
     // Check device ID as a test of SPI communications
-    if (!sensor.checkID()) {
-        Serial.println("Initialization of the sensor sensor failed");
-        while(1) { }
+    if (!sensor.begin()) {
+        Debugger::reportForever("Initialization of the sensor sensor failed");
     }
 
     sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
