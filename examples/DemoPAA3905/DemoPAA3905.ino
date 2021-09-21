@@ -32,9 +32,8 @@
 #include <SPI.h>
 #include "PAA3905.h"
 
-#define CSPIN  10  // default chip select for SPI
-#define MOSI   11  // SPI MOSI pin on Ladybug required for frame capture
-#define MOT     8  // use as data ready interrupt
+static const uint8_t CS_PIN  = 10;  // default chip select for SPI
+static const uint8_t MOT_PIN =  8;  // use as data ready interrupt
 
 // PAA3905 configuration
 
@@ -44,7 +43,7 @@ static const PAA3905::auto_mode_t AUTO_MODE = PAA3905::AUTO_MODE_01;
 
 static const uint8_t ORIENTATION = 0X00; 
 
-static uint8_t pixelRes = 0x2A; // 0x00 to 0xFF
+static const uint8_t RESOLUTION = 0x2A; // 0x00 to 0xFF
 
 static int16_t deltaX, deltaY;
 
@@ -58,7 +57,7 @@ static uint8_t iterations;
 
 static uint32_t frameTime;
 
-PAA3905 opticalFlow(CSPIN); // Instantiate PAA3905
+PAA3905 sensor(CS_PIN); // Instantiate PAA3905
 
 static volatile bool motionDetect;
 void myIntHandler()
@@ -72,40 +71,39 @@ void setup()
 
     delay(4000);
 
-    pinMode(MOT, INPUT); // data ready interrupt
-
     // Configure SPI Flash chip select
-    pinMode(CSPIN, OUTPUT);
-    digitalWrite(CSPIN, HIGH);
+    pinMode(CS_PIN, OUTPUT);
+    digitalWrite(CS_PIN, HIGH);
 
     SPI.begin(); // initiate SPI 
     delay(1000);
 
-    opticalFlow.begin();  // Prepare SPI port 
+    sensor.begin();  // Prepare SPI port 
 
     // Check device ID as a test of SPI communications
-    if (!opticalFlow.checkID()) {
-        Serial.println("Initialization of the opticalFlow sensor failed");
+    if (!sensor.checkID()) {
+        Serial.println("Initialization of the sensor sensor failed");
         while(1) { }
     }
 
-    opticalFlow.reset(); // Reset PAA3905 to return all registers to default before configuring
+    sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
 
-    opticalFlow.setMode(DETECTION_MODE, AUTO_MODE);         // set modes
+    sensor.setMode(DETECTION_MODE, AUTO_MODE);         // set modes
 
-    opticalFlow.setResolution(pixelRes);         // set resolution fraction of default 0x2A
-    float resolution = (opticalFlow.getResolution() + 1) * 200.0f/8600.0f; // == 1 if pixelRes == 0x2A
+    sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
+    float resolution = (sensor.getResolution() + 1) * 200.0f/8600.0f; // == 1 if RESOLUTION == 0x2A
     Serial.print("Resolution is: "); Serial.print(resolution * 11.914f, 1); Serial.println(" CPI per meter height"); Serial.println(" ");
 
-    opticalFlow.setOrientation(ORIENTATION);
-    uint8_t orientation = opticalFlow.getOrientation();
+    sensor.setOrientation(ORIENTATION);
+    uint8_t orientation = sensor.getOrientation();
     if(orientation & 0x80) Serial.println("X direction inverted!"); Serial.println(" ");
     if(orientation & 0x40) Serial.println("Y direction inverted!"); Serial.println(" ");
     if(orientation & 0x20) Serial.println("X and Y swapped!"); Serial.println(" ");
 
-    attachInterrupt(MOT, myIntHandler, FALLING); // data ready interrupt active LOW 
+    pinMode(MOT_PIN, INPUT); // data ready interrupt
+    attachInterrupt(MOT_PIN, myIntHandler, FALLING); // data ready interrupt active LOW 
 
-    statusCheck = opticalFlow.status();          // clear interrupt before entering main loop
+    statusCheck = sensor.status();          // clear interrupt before entering main loop
 
 } // setup
 
@@ -118,11 +116,11 @@ void loop()
     if(motionDetect){
         motionDetect = false;
 
-        //   statusCheck = opticalFlow.status(); // clear interrupt
+        //   statusCheck = sensor.status(); // clear interrupt
         //   if(statusCheck & 0x01) Serial.println("Challenging surface detected!");
         //   if(statusCheck & 0x80) { //Check that motion data is available
-        //   opticalFlow.readMotionCount(&deltaX, &deltaY, &SQUAL, &Shutter);  // read some of the data
-        opticalFlow.readBurstMode(dataArray); // use burst mode to read all of the data
+        //   sensor.readMotionCount(&deltaX, &deltaY, &SQUAL, &Shutter);  // read some of the data
+        sensor.readBurstMode(dataArray); // use burst mode to read all of the data
     }
 
     if(dataArray[0] & 0x80) {   // Check if motion data available
@@ -138,7 +136,7 @@ void loop()
         Shutter = ((uint32_t)dataArray[11] << 16) | ((uint32_t)dataArray[12] << 8) | dataArray[13];
         Shutter &= 0x7FFFFF; // 23-bit positive integer 
 
-        //   mode =    opticalFlow.getMode();
+        //   mode =    sensor.getMode();
         mode = (dataArray[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
         // Don't report data if under thresholds
         if((mode == bright       ) && (SQUAL < 25) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
@@ -167,9 +165,9 @@ void loop()
         delay(4000);
 
         frameTime = millis();
-        opticalFlow.enterFrameCaptureMode();   
-        opticalFlow.captureFrame(frameArray);
-        opticalFlow.exitFrameCaptureMode(); // exit fram capture mode
+        sensor.enterFrameCaptureMode();   
+        sensor.captureFrame(frameArray);
+        sensor.exitFrameCaptureMode(); // exit fram capture mode
         Serial.print("Frame time = "); Serial.print(millis() - frameTime); Serial.println(" ms"); Serial.println(" ");
 
         for(uint8_t ii = 0; ii < 35; ii++) // plot the frame data on the serial monitor (TFT display would be better)
@@ -183,16 +181,16 @@ void loop()
         }
         Serial.println(" ");
 
-        opticalFlow.exitFrameCaptureMode(); // exit fram capture mode
+        sensor.exitFrameCaptureMode(); // exit fram capture mode
         Serial.print("Frame time = "); Serial.print(millis() - frameTime); Serial.println(" ms"); Serial.println(" ");
 
         // Return to navigation mode
-        opticalFlow.reset(); // Reset PAA3905 to return all registers to default before configuring
+        sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
         delay(50);
-        opticalFlow.setMode(mode, AUTO_MODE);         // set modes
-        opticalFlow.setResolution(pixelRes);         // set resolution fraction of default 0x2A
-        opticalFlow.setOrientation(ORIENTATION);
-        statusCheck = opticalFlow.status();          // clear interrupt before entering main loop
+        sensor.setMode(mode, AUTO_MODE);         // set modes
+        sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
+        sensor.setOrientation(ORIENTATION);
+        statusCheck = sensor.status();          // clear interrupt before entering main loop
         Serial.println("Back in Navigation mode!");
     }
 
