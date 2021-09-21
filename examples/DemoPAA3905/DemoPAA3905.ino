@@ -35,8 +35,6 @@
 static const uint8_t CS_PIN  = 10;  // default chip select for SPI
 static const uint8_t MOT_PIN =  8;  // use as data ready interrupt
 
-// PAA3905 configuration
-
 static const PAA3905::detection_mode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
 
 static const PAA3905::auto_mode_t AUTO_MODE = PAA3905::AUTO_MODE_01;
@@ -44,8 +42,6 @@ static const PAA3905::auto_mode_t AUTO_MODE = PAA3905::AUTO_MODE_01;
 static const uint8_t ORIENTATION = 0X00; 
 
 static const uint8_t RESOLUTION = 0x2A; // 0x00 to 0xFF
-
-static int16_t deltaX, deltaY;
 
 static uint32_t Shutter;
 
@@ -124,8 +120,8 @@ void loop()
 
         if (dataArray[0]  & 0x01) Serial.println("Challenging surface detected!");
 
-        deltaX = ((int16_t)dataArray[3] << 8) | dataArray[2];
-        deltaY = ((int16_t)dataArray[5] << 8) | dataArray[4];
+        int16_t deltaX = ((int16_t)dataArray[3] << 8) | dataArray[2];
+        int16_t deltaY = ((int16_t)dataArray[5] << 8) | dataArray[4];
         SQUAL = dataArray[7];      // surface quality
         RawDataSum = dataArray[8];
         RawDataMax = dataArray[9];
