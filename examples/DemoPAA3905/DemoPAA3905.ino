@@ -135,24 +135,24 @@ void loop()
         if ((mode == superlowlight) && (surfaceQuality < 85) && (shutter >= 0x025998)) deltaX = deltaY = 0;
 
         // Report mode
-        if (mode == bright)        Serial.println("Bright Mode"); 
-        if (mode == lowlight)      Serial.println("Low Light Mode"); 
-        if (mode == superlowlight) Serial.println("Super Low Light Mode"); 
-        if (mode == unknown)       Serial.println("Unknown Mode"); 
+        if (mode == bright)        Debugger::printf("\nBright Mode\n"); 
+        if (mode == lowlight)      Debugger::printf("\nLow Light Mode\n"); 
+        if (mode == superlowlight) Debugger::printf("\nSuper Low Light Mode\n"); 
+        if (mode == unknown)       Debugger::printf("\nUnknown Mode\n"); 
 
         // Data and Diagnostics output
-        Serial.print("X: ");Serial.print(deltaX);Serial.print(", Y: ");Serial.println(deltaY);
-        Serial.print("Number of Valid Features: ");Serial.print(4*surfaceQuality);
-        Serial.print(", shutter: 0x");Serial.println(shutter, HEX);
-        Serial.print("Max raw Data: ");Serial.print(rawDataMax);Serial.print(", Min raw Data: ");Serial.print(rawDataMin);
-        Serial.print(", Avg raw Data: ");Serial.println(rawDataSum); Serial.println(" ");
+        Debugger::printf("X: %d  Y: %d\n", deltaX, deltaY);
+        Debugger::printf("Number of Valid Features: %d, shutter: 0x%X\n",
+            4*surfaceQuality, shutter);
+        Debugger::printf("Max raw data: %d  Min raw data: %d  Avg raw data: %d\n",
+            rawDataMax, rawDataMin, rawDataSum);
     }
 
     // Frame capture
     if (iterations >= 100) // capture one frame per 100 iterations (~5 sec) of navigation
     {
         iterations = 0;
-        Serial.println("Hold camera still for frame capture!");
+        Debugger::printf("Hold camera still for frame capture!\n");
         delay(4000);
 
         uint32_t frameTime = millis();
@@ -160,10 +160,9 @@ void loop()
         sensor.enterFrameCaptureMode();   
         sensor.captureFrame(frameArray);
         sensor.exitFrameCaptureMode(); // exit fram capture mode
-        Serial.print("Frame time = "); Serial.print(millis() - frameTime); Serial.println(" ms"); Serial.println(" ");
+        Debugger::printf("Frame time = %d ms\n", millis() - frameTime);
 
-        for (uint8_t ii = 0; ii < 35; ii++) // plot the frame data on the serial monitor (TFT display would be better)
-        {
+        for (uint8_t ii = 0; ii < 35; ii++) {
             Serial.print(ii); Serial.print(" "); 
             for (uint8_t jj = 0; jj < 35; jj++)
             {
@@ -174,7 +173,7 @@ void loop()
         Serial.println(" ");
 
         sensor.exitFrameCaptureMode(); // exit fram capture mode
-        Serial.print("Frame time = "); Serial.print(millis() - frameTime); Serial.println(" ms"); Serial.println(" ");
+        Debugger::printf("Frame time = %d ms\n", millis() - frameTime);
 
         // Return to navigation mode
         sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
@@ -183,7 +182,7 @@ void loop()
         sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
         sensor.setOrientation(ORIENTATION);
         sensor.status();          // clear interrupt before entering main loop
-        Serial.println("Back in Navigation mode!");
+        Debugger::printf("Back in Navigation mode!\n");
     }
 
     //  STM32L4.sleep();
