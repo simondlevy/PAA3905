@@ -8,3 +8,9 @@ Arduino library for the
 This code is based on Kris Winer's PAA3905 [sketches](https://github.com/kriswiner/PAA3905).  As usual, I took
 Kris's code an made an Arduino library that you can clone into your Arduino/libraries folder to
 run examples and use for other projects.
+
+I have tested this library on the following platforms:
+
+* Teensy 4.0 from PJRC
+
+* Ladybug STM32L4 from Tlera Corporation
