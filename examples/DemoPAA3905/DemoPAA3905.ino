@@ -77,7 +77,7 @@ void setup()
 
     sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
     float resolution = (sensor.getResolution() + 1) * 200.0f/8600.0f; // == 1 if RESOLUTION == 0x2A
-    Serial.print("Resolution is: "); Serial.print(resolution * 11.914f, 1); Serial.println(" CPI per meter height"); Serial.println(" ");
+    Debugger::printf("Resolution is %0.1f CPI per meter height\n", resolution * 11.914f);
 
     sensor.setOrientation(ORIENTATION);
     uint8_t orientation = sensor.getOrientation();
