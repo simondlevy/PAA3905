@@ -47,8 +47,15 @@ class PAA3905 {
         void initRegisters(uint8_t mode);
 
         void readMotionCount(int16_t *deltaX, int16_t *deltaY, uint8_t *SQUAL, uint32_t *Shutter);
+        void readBurstMode(); 
 
-        void readBurstMode(uint8_t * dataArray); 
+        bool motionDataAvailable(void);
+
+        bool challengingSurfaceDetected(void);
+
+        int16_t getDeltaX(void);
+
+        int16_t getDeltaY(void);
 
         void setMode(uint8_t mode, uint8_t autoSwitch);
 
@@ -101,6 +108,8 @@ class PAA3905 {
         static const uint8_t PAA3905_INVERSE_PRODUCT_ID    = 0x5F ;// default value = 0x5D
 
         uint8_t _cs = 0;
+
+        uint8_t _data[14] = {};
 
         void writeByte(uint8_t reg, uint8_t value);
 

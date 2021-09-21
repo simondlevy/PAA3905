@@ -154,8 +154,27 @@ void PAA3905::readMotionCount(int16_t *deltaX, int16_t *deltaY, uint8_t *SQUAL, 
     *Shutter = ((uint32_t)readByte(PAA3905_SHUTTER_H) << 16) | ((uint32_t)readByte(PAA3905_SHUTTER_M) << 8) | readByte(PAA3905_SHUTTER_L);
 }
 
+bool PAA3905::motionDataAvailable(void)
+{
+    return _data[0] & 0x80;
+}
 
-void PAA3905::readBurstMode(uint8_t * dataArray)
+bool PAA3905::challengingSurfaceDetected(void)
+{
+    return _data[0] & 0x01;
+}
+
+int16_t PAA3905::getDeltaX(void)
+{
+    return ((int16_t)_data[3] << 8) | _data[2];
+}
+
+int16_t PAA3905::getDeltaY(void)
+{
+    return ((int16_t)_data[5] << 8) | _data[4];
+}
+
+void PAA3905::readBurstMode(void)
 {
     SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
 
@@ -166,9 +185,8 @@ void PAA3905::readBurstMode(uint8_t * dataArray)
     digitalWrite(MOSI, HIGH); // hold MOSI high during burst read
     delayMicroseconds(2);
 
-    for(uint8_t ii = 0; ii < 14; ii++)
-    {
-        dataArray[ii] = SPI.transfer(0);
+    for(uint8_t ii = 0; ii < 14; ii++) {
+        _data[ii] = SPI.transfer(0);
     }
     digitalWrite(MOSI, LOW); // return MOSI to LOW
     digitalWrite(_cs, HIGH);

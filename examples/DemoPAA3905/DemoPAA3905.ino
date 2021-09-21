@@ -102,7 +102,6 @@ void loop()
 {
     static uint8_t iterations;
     static uint8_t mode;
-    static uint8_t dataArray[14];
 
     iterations++;
 
@@ -111,24 +110,28 @@ void loop()
 
         motionDetect = false;
 
-        sensor.readBurstMode(dataArray); // use burst mode to read all of the data
+        sensor.readBurstMode(); // use burst mode to read all of the data
     }
 
-    if (dataArray[0] & 0x80) {   // Check if motion data available
+    if (sensor.motionDataAvailable()) { 
 
-        if (dataArray[0]  & 0x01) Serial.println("Challenging surface detected!");
+        if (sensor.challengingSurfaceDetected()) {
+            Debugger::printf("Challenging surface detected!\n");
+        }
 
-        int16_t deltaX = ((int16_t)dataArray[3] << 8) | dataArray[2];
-        int16_t deltaY = ((int16_t)dataArray[5] << 8) | dataArray[4];
-        uint8_t surfaceQuality = dataArray[7];      // surface quality
-        uint8_t rawDataSum = dataArray[8];
-        uint8_t rawDataMax = dataArray[9];
-        uint8_t rawDataMin = dataArray[10];
-        uint32_t shutter = ((uint32_t)dataArray[11] << 16) | ((uint32_t)dataArray[12] << 8) | dataArray[13];
+        int16_t deltaX = sensor.getDeltaX();
+        int16_t deltaY = sensor.getDeltaY();
+
+        /*
+        uint8_t surfaceQuality = _data[7];      // surface quality
+        uint8_t rawDataSum = _data[8];
+        uint8_t rawDataMax = _data[9];
+        uint8_t rawDataMin = _data[10];
+        uint32_t shutter = ((uint32_t)_data[11] << 16) | ((uint32_t)_data[12] << 8) | _data[13];
         shutter &= 0x7FFFFF; // 23-bit positive integer 
 
         //   mode =    sensor.getMode();
-        mode = (dataArray[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
+        mode = (_data[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
         // Don't report data if under thresholds
         if ((mode == bright       ) && (surfaceQuality < 25) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
         if ((mode == lowlight     ) && (surfaceQuality < 70) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
@@ -139,13 +142,15 @@ void loop()
         if (mode == lowlight)      Debugger::printf("\nLow Light Mode\n"); 
         if (mode == superlowlight) Debugger::printf("\nSuper Low Light Mode\n"); 
         if (mode == unknown)       Debugger::printf("\nUnknown Mode\n"); 
-
+*/
         // Data and Diagnostics output
         Debugger::printf("X: %d  Y: %d\n", deltaX, deltaY);
+        /*
         Debugger::printf("Number of Valid Features: %d, shutter: 0x%X\n",
             4*surfaceQuality, shutter);
         Debugger::printf("Max raw data: %d  Min raw data: %d  Avg raw data: %d\n",
             rawDataMax, rawDataMin, rawDataSum);
+            */
     }
 
     // Frame capture
