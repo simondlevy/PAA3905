@@ -24,6 +24,7 @@
    The sensor can also operate in raw data (frame grab) mode producing 35 x 35
    pixel images from the sensor at a frame rate of ~15 Hz. This makes the PAA3905
    an inexpensive, low-resolution, infrared-sensitive video camera.
+
    Copyright (c) 2021 Tlera Corporiation and Simon D. Levy
 
    MIT License
@@ -32,24 +33,17 @@
 #include <SPI.h>
 #include "PAA3905.h"
 
-static const uint8_t CS_PIN  = 10;  // default chip select for SPI
-static const uint8_t MOT_PIN =  8;  // use as data ready interrupt
+static const uint8_t CS_PIN  = 10; 
+static const uint8_t MOT_PIN =  8; 
 
 static const PAA3905::detection_mode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
-
 static const PAA3905::auto_mode_t AUTO_MODE = PAA3905::AUTO_MODE_01;
-
 static const uint8_t ORIENTATION = 0X00; 
-
 static const uint8_t RESOLUTION = 0x2A; // 0x00 to 0xFF
-
-static uint8_t statusCheck;
 
 static uint8_t frameArray[1225], dataArray[14], SQUAL, RawDataSum = 0, RawDataMin = 0, RawDataMax = 0;
 
-static uint32_t frameTime;
-
-PAA3905 sensor(CS_PIN); // Instantiate PAA3905
+PAA3905 sensor(CS_PIN);
 
 static volatile bool motionDetect;
 void myIntHandler()
@@ -95,7 +89,7 @@ void setup()
     pinMode(MOT_PIN, INPUT); // data ready interrupt
     attachInterrupt(MOT_PIN, myIntHandler, FALLING); // data ready interrupt active LOW 
 
-    statusCheck = sensor.status();          // clear interrupt before entering main loop
+    sensor.status();          // clear interrupt before entering main loop
 
 } // setup
 
@@ -155,7 +149,7 @@ void loop()
         Serial.println("Hold camera still for frame capture!");
         delay(4000);
 
-        frameTime = millis();
+        uint32_t frameTime = millis();
         sensor.enterFrameCaptureMode();   
         sensor.captureFrame(frameArray);
         sensor.exitFrameCaptureMode(); // exit fram capture mode
@@ -181,7 +175,7 @@ void loop()
         sensor.setMode(mode, AUTO_MODE);         // set modes
         sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
         sensor.setOrientation(ORIENTATION);
-        statusCheck = sensor.status();          // clear interrupt before entering main loop
+        sensor.status();          // clear interrupt before entering main loop
         Serial.println("Back in Navigation mode!");
     }
 
