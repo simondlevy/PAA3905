@@ -100,10 +100,15 @@ class PAA3905 {
         static const uint8_t PAA3905_ORIENTATION           = 0x5B;
         static const uint8_t PAA3905_INVERSE_PRODUCT_ID    = 0x5F ;// default value = 0x5D
 
-        uint8_t _cs, _mode;
+        uint8_t _cs = 0;
+
         void writeByte(uint8_t reg, uint8_t value);
+
         void writeByteDelay(uint8_t reg, uint8_t value);
+
         uint8_t readByte(uint8_t reg);
+
         void standardDetection(void);
+
         void enhancedDetection(void);
 };

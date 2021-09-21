@@ -34,7 +34,6 @@ bool PAA3905::begin(void)
 
 void PAA3905::setMode(uint8_t mode, uint8_t autoMode) 
 {
-    _mode = mode;
     reset();
     initRegisters(mode);
 
@@ -54,9 +53,8 @@ void PAA3905::setMode(uint8_t mode, uint8_t autoMode)
 
 uint8_t PAA3905::getMode() 
 {
-    uint8_t _mode = readByte(PAA3905_OBSERVATION);
-    _mode &= 0xC0;  // only look at bits 6 and 7 for mode
-    return _mode;
+    // only look at bits 6 and 7 for mode    
+    return readByte(PAA3905_OBSERVATION) & 0xc0;
 }
 
 
