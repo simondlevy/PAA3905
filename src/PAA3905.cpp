@@ -37,7 +37,7 @@ void PAA3905::setMode(uint8_t mode, uint8_t autoMode)
     reset();
     initRegisters(mode);
 
-    if(autoMode == autoMode012){
+    if (autoMode == AUTO_MODE_012){
         writeByteDelay(0x7F, 0x08);
         writeByteDelay(0x68, 0x02);
         writeByteDelay(0x7F, 0x00);
@@ -209,7 +209,7 @@ void PAA3905::readBurstMode(void)
     digitalWrite(MOSI, HIGH); // hold MOSI high during burst read
     delayMicroseconds(2);
 
-    for(uint8_t ii = 0; ii < 14; ii++) {
+    for (uint8_t ii = 0; ii < 14; ii++) {
         _data[ii] = SPI.transfer(0);
     }
     digitalWrite(MOSI, LOW); // return MOSI to LOW
@@ -264,7 +264,8 @@ uint8_t PAA3905::readByte(uint8_t reg)
 
 void PAA3905::enterFrameCaptureMode()
 {
-    setMode(DETECTION_STANDARD, autoMode01); // make sure not in superlowlight mode for frame capture
+    // make sure not in superlowlight mode for frame capture
+    setMode(DETECTION_STANDARD, AUTO_MODE_01); 
 
     writeByteDelay(0x7F, 0x00);
     writeByteDelay(0x67, 0x25);
@@ -287,9 +288,9 @@ void PAA3905::captureFrame(uint8_t * frameArray)
 
     writeByteDelay(PAA3905_RAWDATA_GRAB, 0xFF); // start frame capture mode
 
-    for(uint8_t ii = 0; ii < 35; ii++)
+    for (uint8_t ii = 0; ii < 35; ii++)
     {
-        for(uint8_t jj = 0; jj < 35; jj++)
+        for (uint8_t jj = 0; jj < 35; jj++)
         {
             frameArray[ii*35 + jj] = readByte(PAA3905_RAWDATA_GRAB); // read the 1225 data into array
         }

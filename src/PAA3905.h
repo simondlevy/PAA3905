@@ -9,9 +9,6 @@
 
 #include "Arduino.h"
 
-#define autoMode012       0
-#define autoMode01        1
-
 #define bright        0
 #define lowlight      1
 #define superlowlight 2
