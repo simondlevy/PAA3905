@@ -41,7 +41,7 @@ static const PAA3905::auto_mode_t AUTO_MODE = PAA3905::AUTO_MODE_01;
 static const uint8_t ORIENTATION = 0X00; 
 static const uint8_t RESOLUTION = 0x2A; // 0x00 to 0xFF
 
-static uint8_t frameArray[1225], dataArray[14], SQUAL, RawDataSum = 0, RawDataMin = 0, RawDataMax = 0;
+static uint8_t frameArray[1225], dataArray[14];
 
 PAA3905 sensor(CS_PIN);
 
@@ -114,19 +114,19 @@ void loop()
 
         int16_t deltaX = ((int16_t)dataArray[3] << 8) | dataArray[2];
         int16_t deltaY = ((int16_t)dataArray[5] << 8) | dataArray[4];
-        SQUAL = dataArray[7];      // surface quality
-        RawDataSum = dataArray[8];
-        RawDataMax = dataArray[9];
-        RawDataMin = dataArray[10];
+        uint8_t surfaceQuality = dataArray[7];      // surface quality
+        uint8_t rawDataSum = dataArray[8];
+        uint8_t rawDataMax = dataArray[9];
+        uint8_t rawDataMin = dataArray[10];
         uint32_t shutter = ((uint32_t)dataArray[11] << 16) | ((uint32_t)dataArray[12] << 8) | dataArray[13];
         shutter &= 0x7FFFFF; // 23-bit positive integer 
 
         //   mode =    sensor.getMode();
         mode = (dataArray[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
         // Don't report data if under thresholds
-        if ((mode == bright       ) && (SQUAL < 25) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if ((mode == lowlight     ) && (SQUAL < 70) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if ((mode == superlowlight) && (SQUAL < 85) && (shutter >= 0x025998)) deltaX = deltaY = 0;
+        if ((mode == bright       ) && (surfaceQuality < 25) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
+        if ((mode == lowlight     ) && (surfaceQuality < 70) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
+        if ((mode == superlowlight) && (surfaceQuality < 85) && (shutter >= 0x025998)) deltaX = deltaY = 0;
 
         // Report mode
         if (mode == bright)        Serial.println("Bright Mode"); 
@@ -136,10 +136,10 @@ void loop()
 
         // Data and Diagnostics output
         Serial.print("X: ");Serial.print(deltaX);Serial.print(", Y: ");Serial.println(deltaY);
-        Serial.print("Number of Valid Features: ");Serial.print(4*SQUAL);
+        Serial.print("Number of Valid Features: ");Serial.print(4*surfaceQuality);
         Serial.print(", shutter: 0x");Serial.println(shutter, HEX);
-        Serial.print("Max Raw Data: ");Serial.print(RawDataMax);Serial.print(", Min Raw Data: ");Serial.print(RawDataMin);
-        Serial.print(", Avg Raw Data: ");Serial.println(RawDataSum); Serial.println(" ");
+        Serial.print("Max raw Data: ");Serial.print(rawDataMax);Serial.print(", Min raw Data: ");Serial.print(rawDataMin);
+        Serial.print(", Avg raw Data: ");Serial.println(rawDataSum); Serial.println(" ");
     }
 
     // Frame capture
