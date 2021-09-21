@@ -152,7 +152,7 @@ void loop()
     if (iterations >= 100) // capture one frame per 100 iterations (~5 sec) of navigation
     {
         iterations = 0;
-        Debugger::printf("Hold camera still for frame capture!\n");
+        Debugger::printf("\nHold camera still for frame capture!\n");
         delay(4000);
 
         uint32_t frameTime = millis();
