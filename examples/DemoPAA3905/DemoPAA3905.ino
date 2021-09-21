@@ -53,8 +53,6 @@ static uint8_t statusCheck;
 
 static uint8_t frameArray[1225], dataArray[14], SQUAL, RawDataSum = 0, RawDataMin = 0, RawDataMax = 0;
 
-static uint8_t iterations;
-
 static uint32_t frameTime;
 
 PAA3905 sensor(CS_PIN); // Instantiate PAA3905
@@ -96,9 +94,9 @@ void setup()
 
     sensor.setOrientation(ORIENTATION);
     uint8_t orientation = sensor.getOrientation();
-    if(orientation & 0x80) Serial.println("X direction inverted!"); Serial.println(" ");
-    if(orientation & 0x40) Serial.println("Y direction inverted!"); Serial.println(" ");
-    if(orientation & 0x20) Serial.println("X and Y swapped!"); Serial.println(" ");
+    if (orientation & 0x80) Serial.println("X direction inverted!"); Serial.println(" ");
+    if (orientation & 0x40) Serial.println("Y direction inverted!"); Serial.println(" ");
+    if (orientation & 0x20) Serial.println("X and Y swapped!"); Serial.println(" ");
 
     pinMode(MOT_PIN, INPUT); // data ready interrupt
     attachInterrupt(MOT_PIN, myIntHandler, FALLING); // data ready interrupt active LOW 
@@ -109,23 +107,22 @@ void setup()
 
 void loop()
 {
+    static uint8_t iterations;
     static uint8_t mode;
+
     iterations++;
 
     // Navigation
-    if(motionDetect){
+    if (motionDetect){
+
         motionDetect = false;
 
-        //   statusCheck = sensor.status(); // clear interrupt
-        //   if(statusCheck & 0x01) Serial.println("Challenging surface detected!");
-        //   if(statusCheck & 0x80) { //Check that motion data is available
-        //   sensor.readMotionCount(&deltaX, &deltaY, &SQUAL, &Shutter);  // read some of the data
         sensor.readBurstMode(dataArray); // use burst mode to read all of the data
     }
 
-    if(dataArray[0] & 0x80) {   // Check if motion data available
+    if (dataArray[0] & 0x80) {   // Check if motion data available
 
-        if(dataArray[0]  & 0x01) Serial.println("Challenging surface detected!");
+        if (dataArray[0]  & 0x01) Serial.println("Challenging surface detected!");
 
         deltaX = ((int16_t)dataArray[3] << 8) | dataArray[2];
         deltaY = ((int16_t)dataArray[5] << 8) | dataArray[4];
@@ -139,15 +136,15 @@ void loop()
         //   mode =    sensor.getMode();
         mode = (dataArray[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
         // Don't report data if under thresholds
-        if((mode == bright       ) && (SQUAL < 25) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if((mode == lowlight     ) && (SQUAL < 70) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if((mode == superlowlight) && (SQUAL < 85) && (Shutter >= 0x025998)) deltaX = deltaY = 0;
+        if ((mode == bright       ) && (SQUAL < 25) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
+        if ((mode == lowlight     ) && (SQUAL < 70) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
+        if ((mode == superlowlight) && (SQUAL < 85) && (Shutter >= 0x025998)) deltaX = deltaY = 0;
 
         // Report mode
-        if(mode == bright)        Serial.println("Bright Mode"); 
-        if(mode == lowlight)      Serial.println("Low Light Mode"); 
-        if(mode == superlowlight) Serial.println("Super Low Light Mode"); 
-        if(mode == unknown)       Serial.println("Unknown Mode"); 
+        if (mode == bright)        Serial.println("Bright Mode"); 
+        if (mode == lowlight)      Serial.println("Low Light Mode"); 
+        if (mode == superlowlight) Serial.println("Super Low Light Mode"); 
+        if (mode == unknown)       Serial.println("Unknown Mode"); 
 
         // Data and Diagnostics output
         Serial.print("X: ");Serial.print(deltaX);Serial.print(", Y: ");Serial.println(deltaY);
@@ -158,7 +155,7 @@ void loop()
     }
 
     // Frame capture
-    if(iterations >= 100) // capture one frame per 100 iterations (~5 sec) of navigation
+    if (iterations >= 100) // capture one frame per 100 iterations (~5 sec) of navigation
     {
         iterations = 0;
         Serial.println("Hold camera still for frame capture!");
@@ -170,10 +167,10 @@ void loop()
         sensor.exitFrameCaptureMode(); // exit fram capture mode
         Serial.print("Frame time = "); Serial.print(millis() - frameTime); Serial.println(" ms"); Serial.println(" ");
 
-        for(uint8_t ii = 0; ii < 35; ii++) // plot the frame data on the serial monitor (TFT display would be better)
+        for (uint8_t ii = 0; ii < 35; ii++) // plot the frame data on the serial monitor (TFT display would be better)
         {
             Serial.print(ii); Serial.print(" "); 
-            for(uint8_t jj = 0; jj < 35; jj++)
+            for (uint8_t jj = 0; jj < 35; jj++)
             {
                 Serial.print(frameArray[ii*35 + jj]); Serial.print(" ");  
             }
