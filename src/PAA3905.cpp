@@ -31,6 +31,14 @@ bool PAA3905::begin(void)
     return readByte(PAA3905_PRODUCT_ID) == 0xA2 && readByte(PAA3905_INVERSE_PRODUCT_ID) == 0x5D;
 }
 
+bool PAA3905::dataAboveThresholds(
+        light_mode_t lightMode,
+        uint8_t surfaceQuality,
+        uint32_t shutter)
+{
+    return false;
+}
+
 
 void PAA3905::setMode(uint8_t mode, uint8_t autoMode) 
 {

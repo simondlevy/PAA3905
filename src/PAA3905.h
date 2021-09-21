@@ -90,6 +90,11 @@ class PAA3905 {
 
         void exitFrameCaptureMode();
 
+        static bool dataAboveThresholds(
+                light_mode_t lightMode,
+                uint8_t surfaceQuality,
+                uint32_t shutter);
+
     private:
 
         static const uint8_t PAA3905_PRODUCT_ID            = 0x00; // default value = 0xA2
