@@ -9,14 +9,16 @@
 
 #include "Arduino.h"
 
-#define bright        0
-#define lowlight      1
-#define superlowlight 2
-#define unknown       3
-
 class PAA3905 {
 
     public:
+        
+        typedef enum {
+            LIGHT_MODE_BRIGHT,
+            LIGHT_MODE_LOW,
+            LIGHT_MODE_SUPERLOW,
+            LIGHT_MODE_UNKNOWN
+        } light_mode_t;
 
         typedef enum {
             DETECTION_STANDARD,
@@ -80,7 +82,7 @@ class PAA3905 {
 
         void powerup();
 
-        uint8_t getMode();
+        light_mode_t getLightMode();
 
         void enterFrameCaptureMode();
 

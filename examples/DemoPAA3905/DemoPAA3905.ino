@@ -98,10 +98,10 @@ void setup()
 
 } // setup
 
+
 void loop()
 {
     static uint8_t iterations;
-    static uint8_t mode;
 
     iterations++;
 
@@ -126,28 +126,25 @@ void loop()
         uint8_t rawDataSum = sensor.getRawDataSum();
         uint8_t rawDataMax = sensor.getRawDataMax();
         uint8_t rawDataMin = sensor.getRawDataMin();
-        
+
         uint32_t shutter = sensor.getShutter();
 
-        mode =    sensor.getMode();
-        
-        // Don't report data if under thresholds
-        if ((mode == bright       ) && (surfaceQuality < 25) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if ((mode == lowlight     ) && (surfaceQuality < 70) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if ((mode == superlowlight) && (surfaceQuality < 85) && (shutter >= 0x025998)) deltaX = deltaY = 0;
+        PAA3905::light_mode_t lightMode = sensor.getLightMode();
 
-        // Report mode
-        if (mode == bright)        Debugger::printf("\nBright Mode\n"); 
-        if (mode == lowlight)      Debugger::printf("\nLow Light Mode\n"); 
-        if (mode == superlowlight) Debugger::printf("\nSuper Low Light Mode\n"); 
-        if (mode == unknown)       Debugger::printf("\nUnknown Mode\n"); 
+        static const char * light_mode_names[4] = {"Bright", "Low", "Super-low", "Unknown"};
+        Debugger::printf("\n%s light mode\n", light_mode_names[lightMode]);
+
+        // Don't report data if under thresholds
+        if ((lightMode == PAA3905::LIGHT_MODE_BRIGHT) && (surfaceQuality < 25) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
+        if ((lightMode == PAA3905::LIGHT_MODE_LOW) && (surfaceQuality < 70) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
+        if ((lightMode == PAA3905::LIGHT_MODE_SUPERLOW) && (surfaceQuality < 85) && (shutter >= 0x025998)) deltaX = deltaY = 0;
 
         // Data and Diagnostics output
         Debugger::printf("X: %d  Y: %d\n", deltaX, deltaY);
         Debugger::printf("Number of Valid Features: %d, shutter: 0x%X\n",
-            4*surfaceQuality, shutter);
+                4*surfaceQuality, shutter);
         Debugger::printf("Max raw data: %d  Min raw data: %d  Avg raw data: %d\n",
-            rawDataMax, rawDataMin, rawDataSum);
+                rawDataMax, rawDataMin, rawDataSum);
     }
 
     // Frame capture
@@ -180,7 +177,7 @@ void loop()
         // Return to navigation mode
         sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
         delay(50);
-        sensor.setMode(mode, AUTO_MODE);         // set modes
+        sensor.setMode(DETECTION_MODE, AUTO_MODE); // set modes
         sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
         sensor.setOrientation(ORIENTATION);
         sensor.status();          // clear interrupt before entering main loop
@@ -190,6 +187,6 @@ void loop()
     //  STM32L4.sleep();
     delay(50); // limit reporting to 20 Hz
 
-    } // end of main loop
+} // loop
 
 

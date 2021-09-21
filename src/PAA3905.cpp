@@ -51,9 +51,9 @@ void PAA3905::setMode(uint8_t mode, uint8_t autoMode)
 }
 
 
-uint8_t PAA3905::getMode() 
+PAA3905::light_mode_t PAA3905::getLightMode() 
 {
-    return (_data[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
+    return (light_mode_t)((_data[1] & 0xC0) >> 6);  // mode is bits 6 and 7 
 }
 
 void PAA3905::setResolution(uint8_t res) 
