@@ -53,10 +53,8 @@ void PAA3905::setMode(uint8_t mode, uint8_t autoMode)
 
 uint8_t PAA3905::getMode() 
 {
-    // only look at bits 6 and 7 for mode    
-    return readByte(PAA3905_OBSERVATION) & 0xc0;
+    return (_data[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
 }
-
 
 void PAA3905::setResolution(uint8_t res) 
 {
@@ -172,6 +170,32 @@ int16_t PAA3905::getDeltaX(void)
 int16_t PAA3905::getDeltaY(void)
 {
     return ((int16_t)_data[5] << 8) | _data[4];
+}
+
+uint8_t PAA3905::getSurfaceQuality(void)
+{
+    return _data[7];
+}
+
+uint8_t PAA3905::getRawDataSum(void)
+{
+    return _data[8];
+}
+
+uint8_t PAA3905::getRawDataMax(void)
+{
+    return _data[9];
+}
+
+uint8_t PAA3905::getRawDataMin(void)
+{
+    return _data[10];
+}
+
+uint32_t PAA3905::getShutter(void)
+{
+    // 23-bit positive integer  
+    return (((uint32_t)_data[11] << 16) | ((uint32_t)_data[12] << 8) | _data[13]) & 0x7FFFFF; 
 }
 
 void PAA3905::readBurstMode(void)

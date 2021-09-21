@@ -122,16 +122,15 @@ void loop()
         int16_t deltaX = sensor.getDeltaX();
         int16_t deltaY = sensor.getDeltaY();
 
-        /*
-        uint8_t surfaceQuality = _data[7];      // surface quality
-        uint8_t rawDataSum = _data[8];
-        uint8_t rawDataMax = _data[9];
-        uint8_t rawDataMin = _data[10];
-        uint32_t shutter = ((uint32_t)_data[11] << 16) | ((uint32_t)_data[12] << 8) | _data[13];
-        shutter &= 0x7FFFFF; // 23-bit positive integer 
+        uint8_t surfaceQuality = sensor.getSurfaceQuality();
+        uint8_t rawDataSum = sensor.getRawDataSum();
+        uint8_t rawDataMax = sensor.getRawDataMax();
+        uint8_t rawDataMin = sensor.getRawDataMin();
+        
+        uint32_t shutter = sensor.getShutter();
 
-        //   mode =    sensor.getMode();
-        mode = (_data[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
+        mode =    sensor.getMode();
+        
         // Don't report data if under thresholds
         if ((mode == bright       ) && (surfaceQuality < 25) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
         if ((mode == lowlight     ) && (surfaceQuality < 70) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
@@ -142,15 +141,13 @@ void loop()
         if (mode == lowlight)      Debugger::printf("\nLow Light Mode\n"); 
         if (mode == superlowlight) Debugger::printf("\nSuper Low Light Mode\n"); 
         if (mode == unknown)       Debugger::printf("\nUnknown Mode\n"); 
-*/
+
         // Data and Diagnostics output
         Debugger::printf("X: %d  Y: %d\n", deltaX, deltaY);
-        /*
         Debugger::printf("Number of Valid Features: %d, shutter: 0x%X\n",
             4*surfaceQuality, shutter);
         Debugger::printf("Max raw data: %d  Min raw data: %d  Avg raw data: %d\n",
             rawDataMax, rawDataMin, rawDataSum);
-            */
     }
 
     // Frame capture

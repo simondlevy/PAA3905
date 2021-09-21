@@ -57,6 +57,16 @@ class PAA3905 {
 
         int16_t getDeltaY(void);
 
+        uint8_t getSurfaceQuality(void);
+
+        uint8_t getRawDataSum(void);
+
+        uint8_t getRawDataMax(void);
+
+        uint8_t getRawDataMin(void);
+
+        uint32_t getShutter(void);
+
         void setMode(uint8_t mode, uint8_t autoSwitch);
 
         void setOrientation(uint8_t orient);
@@ -70,7 +80,7 @@ class PAA3905 {
         void reset();
 
         void shutdown();
-        
+
         void powerup();
 
         uint8_t getMode();
