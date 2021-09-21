@@ -43,8 +43,6 @@ static const uint8_t ORIENTATION = 0X00;
 
 static const uint8_t RESOLUTION = 0x2A; // 0x00 to 0xFF
 
-static uint32_t Shutter;
-
 static uint8_t statusCheck;
 
 static uint8_t frameArray[1225], dataArray[14], SQUAL, RawDataSum = 0, RawDataMin = 0, RawDataMax = 0;
@@ -126,15 +124,15 @@ void loop()
         RawDataSum = dataArray[8];
         RawDataMax = dataArray[9];
         RawDataMin = dataArray[10];
-        Shutter = ((uint32_t)dataArray[11] << 16) | ((uint32_t)dataArray[12] << 8) | dataArray[13];
-        Shutter &= 0x7FFFFF; // 23-bit positive integer 
+        uint32_t shutter = ((uint32_t)dataArray[11] << 16) | ((uint32_t)dataArray[12] << 8) | dataArray[13];
+        shutter &= 0x7FFFFF; // 23-bit positive integer 
 
         //   mode =    sensor.getMode();
         mode = (dataArray[1] & 0xC0) >> 6;  // mode is bits 6 and 7 
         // Don't report data if under thresholds
-        if ((mode == bright       ) && (SQUAL < 25) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if ((mode == lowlight     ) && (SQUAL < 70) && (Shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if ((mode == superlowlight) && (SQUAL < 85) && (Shutter >= 0x025998)) deltaX = deltaY = 0;
+        if ((mode == bright       ) && (SQUAL < 25) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
+        if ((mode == lowlight     ) && (SQUAL < 70) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
+        if ((mode == superlowlight) && (SQUAL < 85) && (shutter >= 0x025998)) deltaX = deltaY = 0;
 
         // Report mode
         if (mode == bright)        Serial.println("Bright Mode"); 
@@ -145,7 +143,7 @@ void loop()
         // Data and Diagnostics output
         Serial.print("X: ");Serial.print(deltaX);Serial.print(", Y: ");Serial.println(deltaY);
         Serial.print("Number of Valid Features: ");Serial.print(4*SQUAL);
-        Serial.print(", Shutter: 0x");Serial.println(Shutter, HEX);
+        Serial.print(", shutter: 0x");Serial.println(shutter, HEX);
         Serial.print("Max Raw Data: ");Serial.print(RawDataMax);Serial.print(", Min Raw Data: ");Serial.print(RawDataMin);
         Serial.print(", Avg Raw Data: ");Serial.println(RawDataSum); Serial.println(" ");
     }
