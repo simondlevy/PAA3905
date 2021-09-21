@@ -102,7 +102,6 @@ void loop()
 {
     static uint8_t iterations;
     static uint8_t mode;
-    static uint8_t frameArray[1225];
     static uint8_t dataArray[14];
 
     iterations++;
@@ -157,6 +156,7 @@ void loop()
         delay(4000);
 
         uint32_t frameTime = millis();
+        static uint8_t frameArray[1225];
         sensor.enterFrameCaptureMode();   
         sensor.captureFrame(frameArray);
         sensor.exitFrameCaptureMode(); // exit fram capture mode
