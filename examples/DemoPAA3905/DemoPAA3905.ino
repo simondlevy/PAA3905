@@ -39,9 +39,9 @@ static const uint8_t MOT_PIN =  8;
 
 // Sensor configuration
 static const PAA3905::detection_mode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
-static const PAA3905::auto_mode_t AUTO_MODE = PAA3905::AUTO_MODE_01;
-static const uint8_t ORIENTATION = 0X00; 
-static const uint8_t RESOLUTION = 0x2A; // 0x00 to 0xFF
+static const PAA3905::auto_mode_t AUTO_MODE           = PAA3905::AUTO_MODE_01;
+static const PAA3905::orientation_t ORIENTATION       = PAA3905::ORIENTATION_NORMAL;
+static const uint8_t RESOLUTION                       = 0x2A; // 0x00 to 0xFF
 
 PAA3905 sensor(CS_PIN);
 
@@ -103,7 +103,7 @@ void loop()
     iterations++;
 
     // Navigation
-    if (motionDetect){
+    if (motionDetect) {
 
         motionDetect = false;
 
