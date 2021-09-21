@@ -69,7 +69,6 @@ void PAA3905::setResolution(uint8_t res)
 float PAA3905::getResolution() 
 {
     return (readByte(PAA3905_RESOLUTION) + 1) * 200.0f / 8600 * 11.914;
-;
 }
 
 

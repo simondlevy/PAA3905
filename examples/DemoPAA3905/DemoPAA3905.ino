@@ -81,9 +81,15 @@ void setup()
 
     sensor.setOrientation(ORIENTATION);
     uint8_t orientation = sensor.getOrientation();
-    if (orientation & 0x80) Serial.println("X direction inverted!"); Serial.println(" ");
-    if (orientation & 0x40) Serial.println("Y direction inverted!"); Serial.println(" ");
-    if (orientation & 0x20) Serial.println("X and Y swapped!"); Serial.println(" ");
+    if (orientation & PAA3905::ORIENTATION_XINVERT) {
+        Debugger::printf("X direction inverted!\n");
+    }
+    if (orientation & PAA3905::ORIENTATION_YINVERT) {
+        Debugger::printf("Y direction inverted!\n");
+    }
+    if (orientation & PAA3905::ORIENTATION_SWAP) {
+        Debugger::printf("X and Y swapped!\n");
+    }
 
     pinMode(MOT_PIN, INPUT); // data ready interrupt
     attachInterrupt(MOT_PIN, myIntHandler, FALLING); // data ready interrupt active LOW 
