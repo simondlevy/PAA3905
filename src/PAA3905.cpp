@@ -36,9 +36,28 @@ bool PAA3905::dataAboveThresholds(
         uint8_t surfaceQuality,
         uint32_t shutter)
 {
-    return false;
-}
+    switch (lightMode) {
+        case LIGHT_MODE_BRIGHT:
+            if (surfaceQuality < 25 && shutter >= 0x00FF80) {
+                return false;
+            }
+            break;
+        case LIGHT_MODE_LOW:
+            if (surfaceQuality < 70 && shutter >= 0x00FF80) {
+                return false;
+            }
+            break;
+        case LIGHT_MODE_SUPERLOW:
+            if (surfaceQuality < 85 && shutter >= 0x025998) {
+                return false;
+            }
+            break;
+        default:
+            break;
+    }
 
+    return true;
+}
 
 void PAA3905::setMode(uint8_t mode, uint8_t autoMode) 
 {

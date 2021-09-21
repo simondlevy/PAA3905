@@ -134,13 +134,14 @@ void loop()
         static const char * light_mode_names[4] = {"Bright", "Low", "Super-low", "Unknown"};
         Debugger::printf("\n%s light mode\n", light_mode_names[lightMode]);
 
-        // Don't report data if under thresholds
-        if ((lightMode == PAA3905::LIGHT_MODE_BRIGHT) && (surfaceQuality < 25) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if ((lightMode == PAA3905::LIGHT_MODE_LOW) && (surfaceQuality < 70) && (shutter >= 0x00FF80)) deltaX = deltaY = 0;
-        if ((lightMode == PAA3905::LIGHT_MODE_SUPERLOW) && (surfaceQuality < 85) && (shutter >= 0x025998)) deltaX = deltaY = 0;
+        // Don't report X,Y if surface quality and shutter are under thresholds
+        if (sensor.dataAboveThresholds(lightMode, surfaceQuality, shutter)) {
+            Debugger::printf("X: %d  Y: %d\n", deltaX, deltaY);
+        }
+        else {
+            Debugger::printf("Data is below thresholds for X,Y reporting\n");
+        }
 
-        // Data and Diagnostics output
-        Debugger::printf("X: %d  Y: %d\n", deltaX, deltaY);
         Debugger::printf("Number of Valid Features: %d, shutter: 0x%X\n",
                 4*surfaceQuality, shutter);
         Debugger::printf("Max raw data: %d  Min raw data: %d  Avg raw data: %d\n",
