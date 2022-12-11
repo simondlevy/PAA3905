@@ -13,7 +13,7 @@
 class PAA3905 {
 
     public:
-        
+
         typedef enum {
             LIGHT_MODE_BRIGHT,
             LIGHT_MODE_LOW,
@@ -92,25 +92,73 @@ class PAA3905 {
                 ((uint32_t)readByte(PAA3905_SHUTTER_M) << 8) | readByte(PAA3905_SHUTTER_L);
         }
 
-        void readBurstMode(); 
+        void readBurstMode(void)
+        {
+            SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
 
-        bool motionDataAvailable(void);
+            digitalWrite(_cs, LOW);
+            delayMicroseconds(1);
 
-        bool challengingSurfaceDetected(void);
+            SPI.transfer(PAA3905_MOTION_BURST); // start burst mode
+            digitalWrite(MOSI, HIGH); // hold MOSI high during burst read
+            delayMicroseconds(2);
 
-        int16_t getDeltaX(void);
+            for (uint8_t ii = 0; ii < 14; ii++) {
+                _data[ii] = SPI.transfer(0);
+            }
+            digitalWrite(MOSI, LOW); // return MOSI to LOW
+            digitalWrite(_cs, HIGH);
+            delayMicroseconds(1);
 
-        int16_t getDeltaY(void);
+            SPI.endTransaction();
+        }
 
-        uint8_t getSurfaceQuality(void);
 
-        uint8_t getRawDataSum(void);
+        bool motionDataAvailable(void)
+        {
+            return _data[0] & 0x80;
+        }
 
-        uint8_t getRawDataMax(void);
+        bool challengingSurfaceDetected(void)
+        {
+            return _data[0] & 0x01;
+        }
 
-        uint8_t getRawDataMin(void);
+        int16_t getDeltaX(void)
+        {
+            return ((int16_t)_data[3] << 8) | _data[2];
+        }
 
-        uint32_t getShutter(void);
+        int16_t getDeltaY(void)
+        {
+            return ((int16_t)_data[5] << 8) | _data[4];
+        }
+
+        uint8_t getSurfaceQuality(void)
+        {
+            return _data[7];
+        }
+
+        uint8_t getRawDataSum(void)
+        {
+            return _data[8];
+        }
+
+        uint8_t getRawDataMax(void)
+        {
+            return _data[9];
+        }
+
+        uint8_t getRawDataMin(void)
+        {
+            return _data[10];
+        }
+
+        uint32_t getShutter(void)
+        {
+            // 23-bit positive integer  
+            return (((uint32_t)_data[11] << 16) | ((uint32_t)_data[12] << 8) | _data[13]) & 0x7FFFFF; 
+        }
 
         void setMode(uint8_t mode, uint8_t autoSwitch);
 
