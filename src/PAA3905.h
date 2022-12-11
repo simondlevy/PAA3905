@@ -63,12 +63,35 @@ class PAA3905 {
                 readByte(PAA3905_INVERSE_PRODUCT_ID) == 0x5D;
         }
 
+        uint8_t status()
+        {
+            uint8_t temp = readByte(PAA3905_MOTION); // clears motion interrupt
+            return temp;
+        }
 
-        uint8_t status();
+        void initRegisters(uint8_t mode)
+        {
+            switch(mode)
+            {
+                case 0: // standard detection
+                    standardDetection();
+                    break;
 
-        void initRegisters(uint8_t mode);
+                case 1: // enhanced detection
+                    enhancedDetection();
+                    break;
+            }
+        }
 
-        void readMotionCount(int16_t *deltaX, int16_t *deltaY, uint8_t *SQUAL, uint32_t *Shutter);
+        void readMotionCount(int16_t *deltaX, int16_t *deltaY, uint8_t *SQUAL, uint32_t *Shutter)
+        {
+            *deltaX =  ((int16_t) readByte(PAA3905_DELTA_X_H) << 8) | readByte(PAA3905_DELTA_X_L);
+            *deltaY =  ((int16_t) readByte(PAA3905_DELTA_Y_H) << 8) | readByte(PAA3905_DELTA_X_L);
+            *SQUAL =   readByte(PAA3905_SQUAL);
+            *Shutter = ((uint32_t)readByte(PAA3905_SHUTTER_H) << 16) |
+                ((uint32_t)readByte(PAA3905_SHUTTER_M) << 8) | readByte(PAA3905_SHUTTER_L);
+        }
+
         void readBurstMode(); 
 
         bool motionDataAvailable(void);

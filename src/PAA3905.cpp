@@ -83,21 +83,6 @@ uint8_t PAA3905::getOrientation()
     return temp;
 }
 
-void PAA3905::initRegisters(uint8_t mode)
-{
-    switch(mode)
-    {
-        case 0: // standard detection
-            standardDetection();
-            break;
-
-        case 1: // enhanced detection
-            enhancedDetection();
-            break;
-    }
-}
-
-
 
 void PAA3905::reset()
 {
@@ -139,21 +124,6 @@ void PAA3905::powerup()
     }
 }
 
-
-uint8_t PAA3905::status()
-{
-    uint8_t temp = readByte(PAA3905_MOTION); // clears motion interrupt
-    return temp;
-}
-
-
-void PAA3905::readMotionCount(int16_t *deltaX, int16_t *deltaY, uint8_t *SQUAL, uint32_t *Shutter)
-{
-    *deltaX =  ((int16_t) readByte(PAA3905_DELTA_X_H) << 8) | readByte(PAA3905_DELTA_X_L);
-    *deltaY =  ((int16_t) readByte(PAA3905_DELTA_Y_H) << 8) | readByte(PAA3905_DELTA_X_L);
-    *SQUAL =              readByte(PAA3905_SQUAL);
-    *Shutter = ((uint32_t)readByte(PAA3905_SHUTTER_H) << 16) | ((uint32_t)readByte(PAA3905_SHUTTER_M) << 8) | readByte(PAA3905_SHUTTER_L);
-}
 
 bool PAA3905::motionDataAvailable(void)
 {
