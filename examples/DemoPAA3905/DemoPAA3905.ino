@@ -35,8 +35,8 @@
 #include "Debugger.hpp"
 
 // Pins
-static const uint8_t CS_PIN  = 10; 
-static const uint8_t MOT_PIN =  8; 
+static const uint8_t CS_PIN  = 5; 
+static const uint8_t MOT_PIN = 32; 
 
 // Sensor configuration
 static const PAA3905::detection_mode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;

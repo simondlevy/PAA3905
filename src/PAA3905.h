@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "Arduino.h"
+#include <Arduino.h>
+#include <SPI.h>
 
 class PAA3905 {
 
@@ -37,9 +38,31 @@ class PAA3905 {
             ORIENTATION_SWAP    = 0x20,
         } orientation_t;
 
-        PAA3905(uint8_t cspin);
+        PAA3905(uint8_t cspin)
+            : _cs(cspin)
+        { 
+        }
 
-        bool begin(void);
+        bool begin(void) 
+        {
+            // Setup SPI port
+            // 2 MHz max SPI clock frequency
+            SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3)); 
+
+            // Make sure the SPI bus is reset
+            digitalWrite(_cs, HIGH);
+            delay(1);
+            digitalWrite(_cs, LOW);
+            delay(1);
+            digitalWrite(_cs, HIGH);
+            delay(1);
+
+            SPI.endTransaction();
+
+            return readByte(PAA3905_PRODUCT_ID) == 0xA2 &&
+                readByte(PAA3905_INVERSE_PRODUCT_ID) == 0x5D;
+        }
+
 
         uint8_t status();
 
