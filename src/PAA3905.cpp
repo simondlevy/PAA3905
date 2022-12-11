@@ -35,24 +35,6 @@ bool PAA3905::dataAboveThresholds(
     return true;
 }
 
-void PAA3905::setMode(uint8_t mode, uint8_t autoMode) 
-{
-    reset();
-    initRegisters(mode);
-
-    if (autoMode == AUTO_MODE_012){
-        writeByteDelay(0x7F, 0x08);
-        writeByteDelay(0x68, 0x02);
-        writeByteDelay(0x7F, 0x00);
-    }
-    else
-    {
-        writeByteDelay(0x7F, 0x08);
-        writeByteDelay(0x68, 0x01);
-        writeByteDelay(0x7F, 0x00);
-    }
-}
-
 
 PAA3905::light_mode_t PAA3905::getLightMode() 
 {
@@ -68,19 +50,6 @@ void PAA3905::setResolution(uint8_t res)
 float PAA3905::getResolution() 
 {
     return (readByte(PAA3905_RESOLUTION) + 1) * 200.0f / 8600 * 11.914;
-}
-
-
-void PAA3905::setOrientation(uint8_t orient) 
-{
-    writeByte(PAA3905_ORIENTATION, orient);
-}
-
-
-uint8_t PAA3905::getOrientation() 
-{
-    uint8_t temp = readByte(PAA3905_ORIENTATION);
-    return temp;
 }
 
 

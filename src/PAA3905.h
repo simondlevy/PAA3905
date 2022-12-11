@@ -160,11 +160,34 @@ class PAA3905 {
             return (((uint32_t)_data[11] << 16) | ((uint32_t)_data[12] << 8) | _data[13]) & 0x7FFFFF; 
         }
 
-        void setMode(uint8_t mode, uint8_t autoSwitch);
+        void setMode(uint8_t mode, uint8_t autoMode) 
+        {
+            reset();
+            initRegisters(mode);
 
-        void setOrientation(uint8_t orient);
+            if (autoMode == AUTO_MODE_012){
+                writeByteDelay(0x7F, 0x08);
+                writeByteDelay(0x68, 0x02);
+                writeByteDelay(0x7F, 0x00);
+            }
+            else
+            {
+                writeByteDelay(0x7F, 0x08);
+                writeByteDelay(0x68, 0x01);
+                writeByteDelay(0x7F, 0x00);
+            }
+        }
 
-        uint8_t getOrientation();
+        void setOrientation(uint8_t orient) 
+        {
+            writeByte(PAA3905_ORIENTATION, orient);
+        }
+
+        uint8_t getOrientation() 
+        {
+            uint8_t temp = readByte(PAA3905_ORIENTATION);
+            return temp;
+        }
 
         void setResolution(uint8_t res);
 
