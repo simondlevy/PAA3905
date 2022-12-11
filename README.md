@@ -2,7 +2,7 @@
 <img src="media/paa3905.jpg" width=500></a>
 
 # PAA3905
-Arduino library for the
+Header-only Arduino library for the
 [PAA3905 optical flow camera](https://www.tindie.com/products/onehorse/paa3905-optical-flow-camera/)
 
 This code is based on Kris Winer's PAA3905 [sketches](https://github.com/kriswiner/PAA3905).  As usual, I took
