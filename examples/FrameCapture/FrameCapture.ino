@@ -8,7 +8,7 @@
 
 #include <SPI.h>
 #include "PAA3905_FrameCapture.h"
-#include "Debugger.hpp"
+#include "Debugger.h"
 
 static const uint8_t CS_PIN  = 5; 
 
