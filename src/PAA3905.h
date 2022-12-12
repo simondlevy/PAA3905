@@ -39,7 +39,7 @@ class PAA3905 {
         } orientation_t;
 
         PAA3905(uint8_t cspin)
-            : _cs(cspin)
+            : m_csPin(cspin)
         { 
         }
 
@@ -96,7 +96,7 @@ class PAA3905 {
         {
             SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
 
-            digitalWrite(_cs, LOW);
+            digitalWrite(_m_csPin, LOW);
             delayMicroseconds(1);
 
             SPI.transfer(PAA3905_MOTION_BURST); // start burst mode
@@ -107,7 +107,7 @@ class PAA3905 {
                 _data[ii] = SPI.transfer(0);
             }
             digitalWrite(MOSI, LOW); // return MOSI to LOW
-            digitalWrite(_cs, HIGH);
+            digitalWrite(m_csPin, HIGH);
             delayMicroseconds(1);
 
             SPI.endTransaction();
@@ -220,9 +220,9 @@ class PAA3905 {
 
         void powerup()
         { // exit from shutdown mode
-            digitalWrite(_cs, HIGH);
+            digitalWrite(m_csPin, HIGH);
             delay(1);
-            digitalWrite(_cs, LOW); // reset the SPI port
+            digitalWrite(m_csPin, LOW); // reset the SPI port
             delay(1);
             // Wakeup
             writeByte(PAA3905_SHUTDOWN, 0xC7); // exit shutdown mode
@@ -340,14 +340,14 @@ class PAA3905 {
         static const uint8_t PAA3905_ORIENTATION           = 0x5B;
         static const uint8_t PAA3905_INVERSE_PRODUCT_ID    = 0x5F ;// default value = 0x5D
 
-        uint8_t _cs = 0;
+        uint8_t m_csPin = 0;
 
         uint8_t _data[14] = {};
 
         void writeByte(uint8_t reg, uint8_t value) 
         {
             SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
-            digitalWrite(_cs, LOW);
+            digitalWrite(m_csPin, LOW);
             delayMicroseconds(1);
 
             SPI.transfer(reg | 0x80);
@@ -355,7 +355,7 @@ class PAA3905 {
             SPI.transfer(value);
             delayMicroseconds(1);
 
-            digitalWrite(_cs, HIGH);
+            digitalWrite(m_csPin, HIGH);
             SPI.endTransaction();
         }
 
@@ -368,7 +368,7 @@ class PAA3905 {
         uint8_t readByte(uint8_t reg) 
         {
             SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
-            digitalWrite(_cs, LOW);
+            digitalWrite(m_csPin, LOW);
             delayMicroseconds(1);
 
             SPI.transfer(reg & 0x7F);
@@ -377,7 +377,7 @@ class PAA3905 {
             uint8_t temp = SPI.transfer(0);
             delayMicroseconds(1);
 
-            digitalWrite(_cs, HIGH);
+            digitalWrite(m_csPin, HIGH);
             SPI.endTransaction();
 
             return temp;
