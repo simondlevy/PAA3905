@@ -168,16 +168,6 @@ class PAA3905_MotionCapture : public PAA3905 {
             }
         }
 
-        void setOrientation(uint8_t orient) 
-        {
-            writeByte(ORIENTATION, orient);
-        }
-
-        void setResolution(uint8_t res) 
-        {
-            writeByte(RESOLUTION, res);
-        }
-
         float getResolution() 
         {
             return (readByte(RESOLUTION) + 1) * 200.0f / 8600 * 11.914;
@@ -273,8 +263,6 @@ class PAA3905_MotionCapture : public PAA3905 {
         static const uint8_t MOTION_BURST          = 0x16;
         static const uint8_t POWER_UP_RESET        = 0x3A;
         static const uint8_t SHUTDOWN              = 0x3B;
-        static const uint8_t RESOLUTION            = 0x4E;
-        static const uint8_t ORIENTATION           = 0x5B;
         static const uint8_t INVERSE_PRODUCT_ID    = 0x5F ;// default value = 0x5D
 
         detectionMode_t m_detectionMode; 
