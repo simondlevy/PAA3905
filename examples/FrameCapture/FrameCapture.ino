@@ -7,17 +7,17 @@
  */
 
 #include <SPI.h>
-#include "PAA3905.h"
+#include "PAA3905_FrameCapture.h"
 #include "Debugger.hpp"
 
 static const uint8_t CS_PIN  = 5; 
 
 static const uint32_t FRAME_PERIOD_MSEC = 3000;
 
-PAA3905 _sensor(CS_PIN,
-        PAA3905::DETECTION_STANDARD,
-        PAA3905::AUTO_MODE_01,
-        PAA3905::ORIENTATION_NORMAL,
+PAA3905_FrameCapture _sensor(CS_PIN,
+        PAA3905_FrameCapture::DETECTION_STANDARD,
+        PAA3905_FrameCapture::AUTO_MODE_01,
+        PAA3905_FrameCapture::ORIENTATION_NORMAL,
         0x2A); // resolution 0x00 to 0xFF
 
 void setup() 
@@ -42,7 +42,7 @@ void loop()
     if (msec - _lastCaptureMsec > FRAME_PERIOD_MSEC) {
 
         _lastCaptureMsec = msec;
-    
+
         static uint8_t frameArray[1225];
 
         _sensor.captureFrame(frameArray);

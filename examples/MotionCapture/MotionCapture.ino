@@ -7,16 +7,17 @@
  */
 
 #include <SPI.h>
-#include "PAA3905.h"
+
+#include "PAA3905_MotionCapture.h"
 #include "Debugger.hpp"
 
 static const uint8_t CS_PIN  = 5; 
 static const uint8_t MOT_PIN = 32; 
 
-PAA3905 _sensor(CS_PIN,
-        PAA3905::DETECTION_STANDARD,
-        PAA3905::AUTO_MODE_01,
-        PAA3905::ORIENTATION_NORMAL,
+PAA3905_MotionCapture _sensor(CS_PIN,
+        PAA3905_MotionCapture::DETECTION_STANDARD,
+        PAA3905_MotionCapture::AUTO_MODE_01,
+        PAA3905_MotionCapture::ORIENTATION_NORMAL,
         0x2A); // resolution 0x00 to 0xFF
 
 static volatile bool gotMotionInterrupt;
@@ -74,7 +75,7 @@ void loop()
 
             uint32_t shutter = _sensor.getShutter();
 
-            PAA3905::lightMode_t lightMode = _sensor.getLightMode();
+            PAA3905_MotionCapture::lightMode_t lightMode = _sensor.getLightMode();
 
             static const char * light_mode_names[4] = {"Bright", "Low", "Super-low", "Unknown"};
             Debugger::printf("%s light mode\n", light_mode_names[lightMode]);
