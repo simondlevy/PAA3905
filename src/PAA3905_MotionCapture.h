@@ -235,27 +235,10 @@ class PAA3905_MotionCapture : public PAA3905 {
 
     private:
 
-        static const uint8_t PRODUCT_ID            = 0x00; // default value = 0xA2
-        static const uint8_t REVISION_ID           = 0x01;
-        static const uint8_t MOTION                = 0x02;
         static const uint8_t DELTA_X_L             = 0x03;
         static const uint8_t DELTA_X_H             = 0x04;
         static const uint8_t DELTA_Y_L             = 0x05;
         static const uint8_t DELTA_Y_H             = 0x06;
-        static const uint8_t SQUAL                 = 0x07;
-        static const uint8_t RAWDATA_SUM           = 0x08;
-        static const uint8_t MAX_RAWDATA           = 0x09;
-        static const uint8_t MIN_RAWDATA           = 0x0A;
-        static const uint8_t SHUTTER_L             = 0x0B;
-        static const uint8_t SHUTTER_M             = 0x0C;
-        static const uint8_t SHUTTER_H             = 0x0D;
-        static const uint8_t RAWDATA_GRAB_STATUS   = 0x10;
-        static const uint8_t RAWDATA_GRAB          = 0x13;
-        static const uint8_t OBSERVATION           = 0x15;
-        static const uint8_t MOTION_BURST          = 0x16;
-        static const uint8_t POWER_UP_RESET        = 0x3A;
-        static const uint8_t SHUTDOWN              = 0x3B;
-        static const uint8_t INVERSE_PRODUCT_ID    = 0x5F ;// default value = 0x5D
 
         detectionMode_t m_detectionMode; 
         autoMode_t      m_autoMode; 
