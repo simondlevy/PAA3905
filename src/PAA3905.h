@@ -45,6 +45,10 @@ class PAA3905 {
 
         bool begin(void) 
         {
+            // Configure SPI Flash chip select
+            pinMode(m_csPin, OUTPUT);
+            digitalWrite(m_csPin, HIGH);
+
             // Setup SPI port
             // 2 MHz max SPI clock frequency
             SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3)); 

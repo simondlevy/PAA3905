@@ -46,10 +46,11 @@ static const uint8_t RESOLUTION                       = 0x2A; // 0x00 to 0xFF
 
 PAA3905 sensor(CS_PIN);
 
-static volatile bool motionDetect;
-void myIntHandler()
+static volatile bool gotMotionInterrupt;
+
+void motionInterruptHandler()
 {
-    motionDetect = true;
+    gotMotionInterrupt = true;
 }
 
 void setup() 
@@ -58,12 +59,9 @@ void setup()
 
     delay(4000);
 
-    // Configure SPI Flash chip select
-    pinMode(CS_PIN, OUTPUT);
-    digitalWrite(CS_PIN, HIGH);
-
     // Start SPI
     SPI.begin();
+
     delay(1000);
 
     // Check device ID as a test of SPI communications
@@ -92,7 +90,7 @@ void setup()
     }
 
     pinMode(MOT_PIN, INPUT); // data ready interrupt
-    attachInterrupt(MOT_PIN, myIntHandler, FALLING); // data ready interrupt active LOW 
+    attachInterrupt(MOT_PIN, motionInterruptHandler, FALLING); // data ready interrupt active LOW 
 
     sensor.status();          // clear interrupt before entering main loop
 
@@ -106,9 +104,9 @@ void loop()
     iterations++;
 
     // Navigation
-    if (motionDetect) {
+    if (gotMotionInterrupt) {
 
-        motionDetect = false;
+        gotMotionInterrupt = false;
 
         sensor.readBurstMode(); // use burst mode to read all of the data
     }
