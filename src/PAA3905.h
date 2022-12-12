@@ -50,11 +50,11 @@ class PAA3905 {
             SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3)); 
 
             // Make sure the SPI bus is reset
-            digitalWrite(_cs, HIGH);
+            digitalWrite(m_csPin, HIGH);
             delay(1);
-            digitalWrite(_cs, LOW);
+            digitalWrite(m_csPin, LOW);
             delay(1);
-            digitalWrite(_cs, HIGH);
+            digitalWrite(m_csPin, HIGH);
             delay(1);
 
             SPI.endTransaction();
@@ -96,7 +96,7 @@ class PAA3905 {
         {
             SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
 
-            digitalWrite(_m_csPin, LOW);
+            digitalWrite(m_csPin, LOW);
             delayMicroseconds(1);
 
             SPI.transfer(PAA3905_MOTION_BURST); // start burst mode
