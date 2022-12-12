@@ -38,7 +38,11 @@ class PAA3905 {
             ORIENTATION_SWAP    = 0x20,
         } orientation_t;
 
-        PAA3905(uint8_t cspin)
+        PAA3905(uint8_t cspin,
+                detectionMode_t DETECTION_MODE, 
+                autoMode_t AUTO_MODE,     
+                orientation_t ORIENTATION,
+                uint8_t resolution)
         { 
             m_csPin = cspin;
         }

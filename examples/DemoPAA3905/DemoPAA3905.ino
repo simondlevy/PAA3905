@@ -44,7 +44,11 @@ static const PAA3905::autoMode_t AUTO_MODE           = PAA3905::AUTO_MODE_01;
 static const PAA3905::orientation_t ORIENTATION       = PAA3905::ORIENTATION_NORMAL;
 static const uint8_t RESOLUTION                       = 0x2A; // 0x00 to 0xFF
 
-PAA3905 _sensor(CS_PIN);
+PAA3905 _sensor(CS_PIN,
+        PAA3905::DETECTION_STANDARD,
+        PAA3905::AUTO_MODE_01,
+        PAA3905::ORIENTATION_NORMAL,
+        0x2A); // resolution 0x00 to 0xFF
 
 static volatile bool gotMotionInterrupt;
 
@@ -79,6 +83,7 @@ void setup()
 
     _sensor.setOrientation(ORIENTATION);
     uint8_t orientation = _sensor.getOrientation();
+
     if (orientation & PAA3905::ORIENTATION_XINVERT) {
         Debugger::printf("X direction inverted!\n");
     }
