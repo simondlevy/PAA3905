@@ -45,9 +45,7 @@ void loop()
     
         static uint8_t frameArray[1225];
 
-        _sensor.enterFrameCaptureMode();   
         _sensor.captureFrame(frameArray);
-        _sensor.exitFrameCaptureMode(); // exit fram capture mode
 
         Debugger::printf("Frame time = %d ms\n", millis() - _lastCaptureMsec);
 

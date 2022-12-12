@@ -255,8 +255,8 @@ class PAA3905 {
             return (lightMode_t)((m_data[1] & 0xC0) >> 6);  // mode is bits 6 and 7 
         }
 
-        void enterFrameCaptureMode()
-        {
+        void captureFrame(uint8_t * frameArray)
+        {  
             // make sure not in superlowlight mode for frame capture
             setMode(DETECTION_STANDARD, AUTO_MODE_01); 
 
@@ -269,10 +269,7 @@ class PAA3905 {
             writeByteDelay(0x0F, 0x11);
             writeByteDelay(0x0F, 0x13);
             writeByteDelay(0x0F, 0x11);
-        }
 
-        void captureFrame(uint8_t * frameArray)
-        {  
             uint8_t tempStatus = 0;
 
             // wait for grab status bit 0 to equal 1
@@ -292,17 +289,7 @@ class PAA3905 {
             }
         }
 
-        void exitFrameCaptureMode()
-        {
-            writeByteDelay(0x7F, 0x00);
-            writeByteDelay(0x55, 0x00);
-            writeByteDelay(0x7F, 0x13);
-            writeByteDelay(0x42, 0x00);
-            writeByteDelay(0x7F, 0x00);
-            writeByteDelay(0x67, 0xA5);
-        }
-
-        bool dataAboveThresholds(lightMode_t lightMode, uint8_t surfaceQuality, uint32_t shutter)
+       bool dataAboveThresholds(lightMode_t lightMode, uint8_t surfaceQuality, uint32_t shutter)
         {
             switch (lightMode) {
                 case LIGHT_MODE_BRIGHT:
@@ -540,4 +527,15 @@ class PAA3905 {
 
         } // enhancedDetection
 
+        // XXX useful?
+        void exitFrameCaptureMode()
+        {
+            writeByteDelay(0x7F, 0x00);
+            writeByteDelay(0x55, 0x00);
+            writeByteDelay(0x7F, 0x13);
+            writeByteDelay(0x42, 0x00);
+            writeByteDelay(0x7F, 0x00);
+            writeByteDelay(0x67, 0xA5);
+        }
+ 
 }; // class PAA3905
