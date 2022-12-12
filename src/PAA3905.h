@@ -82,7 +82,11 @@ class PAA3905 {
 
         uint8_t m_csPin;
 
-        PAA3905(SPIClass & spi, uint8_t csPin, orientation_t orientation, uint8_t resolution)
+        PAA3905(
+                SPIClass & spi,
+                const uint8_t csPin,
+                const orientation_t orientation,
+                const uint8_t resolution)
         { 
             m_spi = &spi;
             m_csPin = csPin;
@@ -92,7 +96,7 @@ class PAA3905 {
 
         virtual void initMode(void) = 0;
 
-        void setMode(uint8_t mode, uint8_t autoMode) 
+        void setMode(const uint8_t mode, const uint8_t autoMode) 
         {
             reset();
 
@@ -119,7 +123,7 @@ class PAA3905 {
             }
         }
 
-        void writeByte(uint8_t reg, uint8_t value) 
+        void writeByte(const uint8_t reg, const uint8_t value) 
         {
             m_spi->beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
             digitalWrite(m_csPin, LOW);
@@ -134,13 +138,13 @@ class PAA3905 {
             m_spi->endTransaction();
         }
 
-        void writeByteDelay(uint8_t reg, uint8_t value)
+        void writeByteDelay(const uint8_t reg, const uint8_t value)
         {
             writeByte(reg, value);
             delayMicroseconds(11);
         }
 
-        uint8_t readByte(uint8_t reg) 
+        uint8_t readByte(const uint8_t reg) 
         {
             m_spi->beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
             digitalWrite(m_csPin, LOW);
@@ -187,12 +191,12 @@ class PAA3905 {
 
         uint8_t       m_resolution;
 
-        void setResolution(uint8_t res) 
+        void setResolution(const uint8_t res) 
         {
             writeByte(RESOLUTION, res);
         }
 
-        void setOrientation(uint8_t orient) 
+        void setOrientation(const uint8_t orient) 
         {
             writeByte(ORIENTATION, orient);
         }
@@ -357,5 +361,4 @@ class PAA3905 {
 
         } // enhancedDetection
 
- 
 }; // class PAA3905

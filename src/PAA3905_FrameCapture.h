@@ -16,7 +16,11 @@ class PAA3905_FrameCapture : public PAA3905 {
 
     public:
 
-        PAA3905_FrameCapture(SPIClass & spi, uint8_t csPin, orientation_t orientation, uint8_t resolution) 
+        PAA3905_FrameCapture(
+                SPIClass & spi,
+                const uint8_t csPin,
+                const orientation_t orientation,
+                const uint8_t resolution) 
             : PAA3905(spi, csPin, orientation, resolution)
         { 
         }
@@ -45,12 +49,12 @@ class PAA3905_FrameCapture : public PAA3905 {
 
             writeByteDelay(RAWDATA_GRAB, 0xFF); // start frame capture mode
 
-            for (uint8_t ii = 0; ii < 35; ii++) {
+            for (uint8_t j = 0; j < 35; j++) {
 
-                for (uint8_t jj = 0; jj < 35; jj++) {
+                for (uint8_t k = 0; k < 35; k++) {
 
                     // read the 1225 data into array
-                    frameArray[ii*35 + jj] = readByte(RAWDATA_GRAB); 
+                    frameArray[j*35 + k] = readByte(RAWDATA_GRAB); 
                 }
             }
         }

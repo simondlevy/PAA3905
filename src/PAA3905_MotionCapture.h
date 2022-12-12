@@ -28,12 +28,12 @@ class PAA3905_MotionCapture : public PAA3905 {
             m_autoMode = autoMode;     
         }
 
-        void readMotionCount(int16_t *deltaX, int16_t *deltaY, uint8_t *squal, uint32_t *Shutter)
+        void readMotionCount(int16_t * deltaX, int16_t * deltaY, uint8_t * squal, uint32_t * shutter)
         {
             *deltaX =  ((int16_t) readByte(DELTA_X_H) << 8) | readByte(DELTA_X_L);
             *deltaY =  ((int16_t) readByte(DELTA_Y_H) << 8) | readByte(DELTA_X_L);
             *squal =   readByte(SQUAL);
-            *Shutter = ((uint32_t)readByte(SHUTTER_H) << 16) |
+            *shutter = ((uint32_t)readByte(SHUTTER_H) << 16) |
                 ((uint32_t)readByte(SHUTTER_M) << 8) | readByte(SHUTTER_L);
         }
 
@@ -109,7 +109,8 @@ class PAA3905_MotionCapture : public PAA3905 {
             return (lightMode_t)((m_data[1] & 0xC0) >> 6);  // mode is bits 6 and 7 
         }
 
-       bool dataAboveThresholds(lightMode_t lightMode, uint8_t surfaceQuality, uint32_t shutter)
+       bool dataAboveThresholds(
+               const lightMode_t lightMode, const uint8_t surfaceQuality, const uint32_t shutter)
         {
             switch (lightMode) {
                 case LIGHT_MODE_BRIGHT:
