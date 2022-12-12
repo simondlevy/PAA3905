@@ -70,7 +70,7 @@ class PAA3905_FrameCapture {
             // Return all registers to default before configuring
             reset(); 
 
-            setMode(m_detectionMode, m_autoMode);
+            //setMode(m_detectionMode, m_autoMode);
 
             setResolution(m_resolution);        
 
