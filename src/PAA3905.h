@@ -81,30 +81,16 @@ class PAA3905 {
             setOrientation(m_orientation);
 
             // Clear interrupt
-            status();          
+            clearInterrupt();          
 
             return readByte(PAA3905_PRODUCT_ID) == 0xA2 &&
                 readByte(PAA3905_INVERSE_PRODUCT_ID) == 0x5D;
         }
 
-        uint8_t status()
+        uint8_t clearInterrupt()
         {
             uint8_t temp = readByte(PAA3905_MOTION); // clears motion interrupt
             return temp;
-        }
-
-        void initRegisters(uint8_t mode)
-        {
-            switch(mode)
-            {
-                case 0: // standard detection
-                    standardDetection();
-                    break;
-
-                case 1: // enhanced detection
-                    enhancedDetection();
-                    break;
-            }
         }
 
         void readMotionCount(int16_t *deltaX, int16_t *deltaY, uint8_t *SQUAL, uint32_t *Shutter)
@@ -187,7 +173,16 @@ class PAA3905 {
         void setMode(uint8_t mode, uint8_t autoMode) 
         {
             reset();
-            initRegisters(mode);
+
+            switch(mode) {
+                case 0: // standard detection
+                    standardDetection();
+                    break;
+
+                case 1: // enhanced detection
+                    enhancedDetection();
+                    break;
+            }
 
             if (autoMode == AUTO_MODE_012){
                 writeByteDelay(0x7F, 0x08);

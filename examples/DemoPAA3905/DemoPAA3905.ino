@@ -72,8 +72,6 @@ void setup()
     pinMode(MOT_PIN, INPUT); // data ready interrupt
     attachInterrupt(MOT_PIN, motionInterruptHandler, FALLING); // data ready interrupt active LOW 
 
-    _sensor.status();          // clear interrupt before entering main loop
-
 } // setup
 
 
@@ -164,7 +162,7 @@ void loop()
         _sensor.setMode(DETECTION_MODE, AUTO_MODE); // set modes
         _sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
         _sensor.setOrientation(ORIENTATION);
-        _sensor.status();          // clear interrupt before entering main loop
+        _sensor.clearInterrupt();
         Debugger::printf("Back in Navigation mode!\n");
     }
 
