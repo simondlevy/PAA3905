@@ -74,9 +74,16 @@ class PAA3905 {
             return readByte(PRODUCT_ID) == 0xA2 &&
                 readByte(INVERSE_PRODUCT_ID) == 0x5D;
         }
+        */
 
-    private:
+    protected:
 
+        PAA3905(uint8_t csPin)
+        { 
+            m_csPin = csPin;
+        }
+
+        /*
         void setMode(uint8_t mode, uint8_t autoMode) 
         {
             reset();
@@ -133,8 +140,6 @@ class PAA3905 {
             writeByte(SHUTDOWN, 0xB6);
         }
 
-    private:
-
         static const uint8_t PRODUCT_ID            = 0x00; // default value = 0xA2
         static const uint8_t REVISION_ID           = 0x01;
         static const uint8_t MOTION                = 0x02;
@@ -159,12 +164,14 @@ class PAA3905 {
         static const uint8_t ORIENTATION           = 0x5B;
         static const uint8_t INVERSE_PRODUCT_ID    = 0x5F ;// default value = 0x5D
 
-        uint8_t         m_csPin;
         detectionMode_t m_detectionMode; 
         autoMode_t      m_autoMode; 
         orientation_t   m_orientation;
         uint8_t         m_resolution;
         uint8_t         m_data[14];
+        */
+
+        uint8_t m_csPin;
 
         void writeByte(uint8_t reg, uint8_t value) 
         {
@@ -205,6 +212,7 @@ class PAA3905 {
             return temp;
         }
 
+        /*
         // Performance optimization registers for the three different modes
         void standardDetection() // default
         {

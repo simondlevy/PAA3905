@@ -16,13 +16,12 @@ class PAA3905_MotionCapture : public PAA3905 {
 
     public:
 
-        PAA3905_MotionCapture(uint8_t cspin,
+        PAA3905_MotionCapture(uint8_t csPin,
                 detectionMode_t detectionMode, 
                 autoMode_t autoMode,     
                 orientation_t orientation,
-                uint8_t resolution)
+                uint8_t resolution) : PAA3905(csPin)
         { 
-            m_csPin = cspin;
             m_detectionMode = detectionMode; 
             m_autoMode = autoMode;     
             m_orientation = orientation;
@@ -278,51 +277,11 @@ class PAA3905_MotionCapture : public PAA3905 {
         static const uint8_t ORIENTATION           = 0x5B;
         static const uint8_t INVERSE_PRODUCT_ID    = 0x5F ;// default value = 0x5D
 
-        uint8_t         m_csPin;
         detectionMode_t m_detectionMode; 
         autoMode_t      m_autoMode; 
         orientation_t   m_orientation;
         uint8_t         m_resolution;
         uint8_t         m_data[14];
-
-        void writeByte(uint8_t reg, uint8_t value) 
-        {
-            SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
-            digitalWrite(m_csPin, LOW);
-            delayMicroseconds(1);
-
-            SPI.transfer(reg | 0x80);
-            delayMicroseconds(10);
-            SPI.transfer(value);
-            delayMicroseconds(1);
-
-            digitalWrite(m_csPin, HIGH);
-            SPI.endTransaction();
-        }
-
-        void writeByteDelay(uint8_t reg, uint8_t value)
-        {
-            writeByte(reg, value);
-            delayMicroseconds(11);
-        }
-
-        uint8_t readByte(uint8_t reg) 
-        {
-            SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
-            digitalWrite(m_csPin, LOW);
-            delayMicroseconds(1);
-
-            SPI.transfer(reg & 0x7F);
-            delayMicroseconds(2);
-
-            uint8_t temp = SPI.transfer(0);
-            delayMicroseconds(1);
-
-            digitalWrite(m_csPin, HIGH);
-            SPI.endTransaction();
-
-            return temp;
-        }
 
         // Performance optimization registers for the three different modes
         void standardDetection() // default
