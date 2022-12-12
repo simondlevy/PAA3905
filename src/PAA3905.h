@@ -204,12 +204,6 @@ class PAA3905 {
             writeByte(PAA3905_ORIENTATION, orient);
         }
 
-        uint8_t getOrientation() 
-        {
-            uint8_t temp = readByte(PAA3905_ORIENTATION);
-            return temp;
-        }
-
         void setResolution(uint8_t res) 
         {
             writeByte(PAA3905_RESOLUTION, res);

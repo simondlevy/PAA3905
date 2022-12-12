@@ -38,12 +38,6 @@
 static const uint8_t CS_PIN  = 5; 
 static const uint8_t MOT_PIN = 32; 
 
-// Sensor configuration
-static const PAA3905::detectionMode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
-static const PAA3905::autoMode_t AUTO_MODE           = PAA3905::AUTO_MODE_01;
-static const PAA3905::orientation_t ORIENTATION       = PAA3905::ORIENTATION_NORMAL;
-static const uint8_t RESOLUTION                       = 0x2A; // 0x00 to 0xFF
-
 PAA3905 _sensor(CS_PIN,
         PAA3905::DETECTION_STANDARD,
         PAA3905::AUTO_MODE_01,
@@ -74,18 +68,6 @@ void setup()
     }
 
     Debugger::printf("Resolution is %0.1f CPI per meter height\n", _sensor.getResolution());
-
-    uint8_t orientation = _sensor.getOrientation();
-
-    if (orientation & PAA3905::ORIENTATION_XINVERT) {
-        Debugger::printf("X direction inverted!\n");
-    }
-    if (orientation & PAA3905::ORIENTATION_YINVERT) {
-        Debugger::printf("Y direction inverted!\n");
-    }
-    if (orientation & PAA3905::ORIENTATION_SWAP) {
-        Debugger::printf("X and Y swapped!\n");
-    }
 
     pinMode(MOT_PIN, INPUT); // data ready interrupt
     attachInterrupt(MOT_PIN, motionInterruptHandler, FALLING); // data ready interrupt active LOW 
@@ -170,6 +152,11 @@ void loop()
 
         _sensor.exitFrameCaptureMode(); // exit fram capture mode
         Debugger::printf("Frame time = %d ms\n", millis() - frameTime);
+
+        static const PAA3905::detectionMode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
+        static const PAA3905::autoMode_t AUTO_MODE           = PAA3905::AUTO_MODE_01;
+        static const PAA3905::orientation_t ORIENTATION       = PAA3905::ORIENTATION_NORMAL;
+        static const uint8_t RESOLUTION                       = 0x2A; // 0x00 to 0xFF
 
         // Return to navigation mode
         _sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
