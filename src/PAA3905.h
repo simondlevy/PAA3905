@@ -80,6 +80,9 @@ class PAA3905 {
 
             setOrientation(m_orientation);
 
+            // Clear interrupt
+            status();          
+
             return readByte(PAA3905_PRODUCT_ID) == 0xA2 &&
                 readByte(PAA3905_INVERSE_PRODUCT_ID) == 0x5D;
         }
