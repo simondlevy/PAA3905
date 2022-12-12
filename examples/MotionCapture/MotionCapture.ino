@@ -10,11 +10,8 @@
 #include "PAA3905.h"
 #include "Debugger.hpp"
 
-// Chip-select pin
 static const uint8_t CS_PIN  = 5; 
-
-// Motion-interrupt pin; set to 0 for continuous read
-static const uint8_t MOT_PIN = 0; 
+static const uint8_t MOT_PIN = 32; 
 
 PAA3905 _sensor(CS_PIN,
         PAA3905::DETECTION_STANDARD,
@@ -45,21 +42,23 @@ void setup()
 
     Debugger::printf("Resolution is %0.1f CPI per meter height\n", _sensor.getResolution());
 
-    if (MOT_PIN > 0) {
-        pinMode(MOT_PIN, INPUT); 
-        attachInterrupt(MOT_PIN, motionInterruptHandler, FALLING);
-    }
+    pinMode(MOT_PIN, INPUT); 
+    attachInterrupt(MOT_PIN, motionInterruptHandler, FALLING);
 } 
 
 void loop()
 {
-    if (MOT_PIN == 0 || gotMotionInterrupt) {
+    if (gotMotionInterrupt) {
 
         gotMotionInterrupt = false;
 
         _sensor.readBurstMode(); // use burst mode to read all of the data
 
         if (_sensor.motionDataAvailable()) { 
+
+            static uint32_t _count;
+
+            Debugger::printf("\n%05d ---------------------------------\n", _count++);
 
             if (_sensor.challengingSurfaceDetected()) {
                 Debugger::printf("Challenging surface detected!\n");
@@ -78,7 +77,7 @@ void loop()
             PAA3905::lightMode_t lightMode = _sensor.getLightMode();
 
             static const char * light_mode_names[4] = {"Bright", "Low", "Super-low", "Unknown"};
-            Debugger::printf("\n%s light mode\n", light_mode_names[lightMode]);
+            Debugger::printf("%s light mode\n", light_mode_names[lightMode]);
 
             // Don't report X,Y if surface quality and shutter are under thresholds
             if (_sensor.dataAboveThresholds(lightMode, surfaceQuality, shutter)) {
@@ -93,10 +92,7 @@ void loop()
             Debugger::printf("Max raw data: %d  Min raw data: %d  Avg raw data: %d\n",
                     rawDataMax, rawDataMin, rawDataSum);
         }
-
     }
-
-    delay(50); // limit reporting to 20 Hz
 
 } // loop
 
