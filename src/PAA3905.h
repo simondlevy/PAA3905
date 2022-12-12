@@ -38,7 +38,6 @@ class PAA3905 {
             ORIENTATION_SWAP    = 0x20,
         } orientation_t;
 
-        /*
         bool begin(void) 
         {
             // Configure SPI Flash chip select
@@ -62,10 +61,9 @@ class PAA3905 {
             // Return all registers to default before configuring
             reset(); 
 
-            setMode(m_detectionMode, m_autoMode);
+            initMode();
 
             setResolution(m_resolution);        
-
             setOrientation(m_orientation);
 
             // Clear interrupt
@@ -74,7 +72,6 @@ class PAA3905 {
             return readByte(PRODUCT_ID) == 0xA2 &&
                 readByte(INVERSE_PRODUCT_ID) == 0x5D;
         }
-        */
 
         float getResolution() 
         {
@@ -83,13 +80,13 @@ class PAA3905 {
 
     protected:
 
-        static const uint8_t PRODUCT_ID            = 0x00; // default value = 0xA2
-        static const uint8_t MOTION                = 0x02;
-        static const uint8_t POWER_UP_RESET        = 0x3A;
-        static const uint8_t SHUTDOWN              = 0x3B;
-        static const uint8_t RESOLUTION            = 0x4E;
-        static const uint8_t ORIENTATION           = 0x5B;
-        static const uint8_t INVERSE_PRODUCT_ID    = 0x5F ;// default value = 0x5D
+        static const uint8_t PRODUCT_ID          = 0x00; // default value = 0xA2
+        static const uint8_t MOTION              = 0x02;
+        static const uint8_t POWER_UP_RESET      = 0x3A;
+        static const uint8_t SHUTDOWN            = 0x3B;
+        static const uint8_t RESOLUTION          = 0x4E;
+        static const uint8_t ORIENTATION         = 0x5B;
+        static const uint8_t INVERSE_PRODUCT_ID  = 0x5F ;// default value = 0x5D
 
         PAA3905(uint8_t csPin, orientation_t orientation, uint8_t resolution)
         { 
@@ -97,6 +94,8 @@ class PAA3905 {
             m_orientation = orientation;
             m_resolution = resolution;
         }
+
+        virtual void initMode(void) = 0;
 
         void setResolution(uint8_t res) 
         {

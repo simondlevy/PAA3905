@@ -21,40 +21,6 @@ class PAA3905_FrameCapture : public PAA3905 {
         { 
         }
 
-        bool begin(void) 
-        {
-            // Configure SPI Flash chip select
-            pinMode(m_csPin, OUTPUT);
-            digitalWrite(m_csPin, HIGH);
-
-            // Setup SPI port
-            // 2 MHz max SPI clock frequency
-            SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3)); 
-
-            // Make sure the SPI bus is reset
-            digitalWrite(m_csPin, HIGH);
-            delay(1);
-            digitalWrite(m_csPin, LOW);
-            delay(1);
-            digitalWrite(m_csPin, HIGH);
-            delay(1);
-
-            SPI.endTransaction();
-
-            // Return all registers to default before configuring
-            reset(); 
-
-            setResolution(m_resolution);        
-
-            setOrientation(m_orientation);
-
-            // Clear interrupt
-            readByte(MOTION); // clears motion interrupt
-
-            return readByte(PRODUCT_ID) == 0xA2 &&
-                readByte(INVERSE_PRODUCT_ID) == 0x5D;
-        }
-
         void captureFrame(uint8_t * frameArray)
         {  
             // make sure not in superlowlight mode for frame capture
@@ -88,6 +54,13 @@ class PAA3905_FrameCapture : public PAA3905 {
                 }
             }
         }
+
+    protected:
+
+       virtual void initMode(void) override 
+       {
+           // mode will be set in captureFrame()
+       }
 
     private:
 

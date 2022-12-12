@@ -26,42 +26,6 @@ class PAA3905_MotionCapture : public PAA3905 {
             m_autoMode = autoMode;     
         }
 
-        bool begin(void) 
-        {
-            // Configure SPI Flash chip select
-            pinMode(m_csPin, OUTPUT);
-            digitalWrite(m_csPin, HIGH);
-
-            // Setup SPI port
-            // 2 MHz max SPI clock frequency
-            SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3)); 
-
-            // Make sure the SPI bus is reset
-            digitalWrite(m_csPin, HIGH);
-            delay(1);
-            digitalWrite(m_csPin, LOW);
-            delay(1);
-            digitalWrite(m_csPin, HIGH);
-            delay(1);
-
-            SPI.endTransaction();
-
-            // Return all registers to default before configuring
-            reset(); 
-
-            setMode(m_detectionMode, m_autoMode);
-
-            setResolution(m_resolution);        
-
-            setOrientation(m_orientation);
-
-            // Clear interrupt
-            readByte(MOTION); // clears motion interrupt
-
-            return readByte(PRODUCT_ID) == 0xA2 &&
-                readByte(INVERSE_PRODUCT_ID) == 0x5D;
-        }
-
         void readMotionCount(int16_t *deltaX, int16_t *deltaY, uint8_t *squal, uint32_t *Shutter)
         {
             *deltaX =  ((int16_t) readByte(DELTA_X_H) << 8) | readByte(DELTA_X_L);
@@ -138,52 +102,6 @@ class PAA3905_MotionCapture : public PAA3905 {
             return (((uint32_t)m_data[11] << 16) | ((uint32_t)m_data[12] << 8) | m_data[13]) & 0x7FFFFF; 
         }
 
-        void setMode(uint8_t mode, uint8_t autoMode) 
-        {
-            reset();
-
-            switch(mode) {
-                case 0: // standard detection
-                    standardDetection();
-                    break;
-
-                case 1: // enhanced detection
-                    enhancedDetection();
-                    break;
-            }
-
-            if (autoMode == AUTO_MODE_012){
-                writeByteDelay(0x7F, 0x08);
-                writeByteDelay(0x68, 0x02);
-                writeByteDelay(0x7F, 0x00);
-            }
-            else
-            {
-                writeByteDelay(0x7F, 0x08);
-                writeByteDelay(0x68, 0x01);
-                writeByteDelay(0x7F, 0x00);
-            }
-        }
-
-        void powerup()
-        { // exit from shutdown mode
-            digitalWrite(m_csPin, HIGH);
-            delay(1);
-            digitalWrite(m_csPin, LOW); // reset the SPI port
-            delay(1);
-            // Wakeup
-            writeByte(SHUTDOWN, 0xC7); // exit shutdown mode
-            delay(1);
-            writeByte(SHUTDOWN, 0x00); // clear shutdown register
-            delay(1);
-            // Read the motion registers one time to clear
-            for (uint8_t ii = 0; ii < 5; ii++)
-            {
-                readByte(0x02 + ii);
-                delayMicroseconds(2);
-            }
-        }
-
         lightMode_t getLightMode() 
         {
             return (lightMode_t)((m_data[1] & 0xC0) >> 6);  // mode is bits 6 and 7 
@@ -213,6 +131,13 @@ class PAA3905_MotionCapture : public PAA3905 {
 
             return true;
         }
+
+    protected:
+
+       virtual void initMode(void) override 
+       {
+            setMode(m_detectionMode, m_autoMode);
+       }
 
     private:
 
