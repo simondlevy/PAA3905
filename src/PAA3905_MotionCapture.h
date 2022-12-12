@@ -165,25 +165,6 @@ class PAA3905_MotionCapture : public PAA3905 {
             }
         }
 
-        void reset()
-        {
-            // Power up reset
-            writeByte(POWER_UP_RESET, 0x5A);
-            delay(1); 
-            // Read the motion registers one time to clear
-            for (uint8_t ii = 0; ii < 5; ii++)
-            {
-                readByte(MOTION + ii);
-                delayMicroseconds(2);
-            }
-        }
-
-        void shutdown()
-        {
-            // Enter shutdown mode
-            writeByte(SHUTDOWN, 0xB6);
-        }
-
         void powerup()
         { // exit from shutdown mode
             digitalWrite(m_csPin, HIGH);
@@ -235,15 +216,15 @@ class PAA3905_MotionCapture : public PAA3905 {
 
     private:
 
-        static const uint8_t DELTA_X_L             = 0x03;
-        static const uint8_t DELTA_X_H             = 0x04;
-        static const uint8_t DELTA_Y_L             = 0x05;
-        static const uint8_t DELTA_Y_H             = 0x06;
-        static const uint8_t SQUAL                 = 0x07;
-        static const uint8_t SHUTTER_L             = 0x0B;
-        static const uint8_t SHUTTER_M             = 0x0C;
-        static const uint8_t SHUTTER_H             = 0x0D;
-        static const uint8_t MOTION_BURST          = 0x16;
+        static const uint8_t DELTA_X_L    = 0x03;
+        static const uint8_t DELTA_X_H    = 0x04;
+        static const uint8_t DELTA_Y_L    = 0x05;
+        static const uint8_t DELTA_Y_H    = 0x06;
+        static const uint8_t SQUAL        = 0x07;
+        static const uint8_t SHUTTER_L    = 0x0B;
+        static const uint8_t SHUTTER_M    = 0x0C;
+        static const uint8_t SHUTTER_H    = 0x0D;
+        static const uint8_t MOTION_BURST = 0x16;
 
         detectionMode_t m_detectionMode; 
         autoMode_t      m_autoMode; 
