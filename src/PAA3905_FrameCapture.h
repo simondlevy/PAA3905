@@ -39,14 +39,10 @@ class PAA3905_FrameCapture {
         } orientation_t;
 
         PAA3905_FrameCapture(uint8_t cspin,
-                detectionMode_t detectionMode, 
-                autoMode_t autoMode,     
                 orientation_t orientation,
                 uint8_t resolution)
         { 
             m_csPin = cspin;
-            m_detectionMode = detectionMode; 
-            m_autoMode = autoMode;     
             m_orientation = orientation;
             m_resolution = resolution;
         }
