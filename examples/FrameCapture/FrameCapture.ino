@@ -65,8 +65,6 @@ void loop()
         }
         Debugger::printf("\n");
 
-        _sensor.exitFrameCaptureMode(); 
-
         Debugger::printf("Frame time = %d ms\n", millis() - _lastCaptureMsec);
     }
 
