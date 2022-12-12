@@ -82,11 +82,11 @@ void loop()
 
         Debugger::printf("Frame time = %d ms\n", millis() - frameTime);
 
-        for (uint8_t ii = 0; ii < 35; ii++) {
-            Serial.print(ii); Serial.print(" "); 
-            for (uint8_t jj = 0; jj < 35; jj++)
+        for (uint8_t j = 0; j < 35; j++) {
+            Serial.print(j); Serial.print(" "); 
+            for (uint8_t k = 0; k < 35; k++)
             {
-                Serial.print(frameArray[ii*35 + jj]); Serial.print(" ");  
+                Serial.print(frameArray[j*35 + k]); Serial.print(" ");  
             }
             Serial.println(" ");
         }
