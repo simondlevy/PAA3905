@@ -19,17 +19,17 @@ class PAA3905 {
             LIGHT_MODE_LOW,
             LIGHT_MODE_SUPERLOW,
             LIGHT_MODE_UNKNOWN
-        } light_mode_t;
+        } lightMode_t;
 
         typedef enum {
             DETECTION_STANDARD,
             DETECTION_ENHANCED
-        } detection_mode_t;
+        } detectionMode_t;
 
         typedef enum {
             AUTO_MODE_01,
             AUTO_MODE_012,
-        } auto_mode_t;
+        } autoMode_t;
 
         typedef enum {
             ORIENTATION_NORMAL  = 0x00,
@@ -39,8 +39,8 @@ class PAA3905 {
         } orientation_t;
 
         PAA3905(uint8_t cspin)
-            : m_csPin(cspin)
         { 
+            m_csPin = cspin;
         }
 
         bool begin(void) 
@@ -241,9 +241,9 @@ class PAA3905 {
             }
         }
 
-        light_mode_t getLightMode() 
+        lightMode_t getLightMode() 
         {
-            return (light_mode_t)((_data[1] & 0xC0) >> 6);  // mode is bits 6 and 7 
+            return (lightMode_t)((_data[1] & 0xC0) >> 6);  // mode is bits 6 and 7 
         }
 
         void enterFrameCaptureMode()
@@ -293,7 +293,7 @@ class PAA3905 {
             writeByteDelay(0x67, 0xA5);
         }
 
-        bool dataAboveThresholds(light_mode_t lightMode, uint8_t surfaceQuality, uint32_t shutter)
+        bool dataAboveThresholds(lightMode_t lightMode, uint8_t surfaceQuality, uint32_t shutter)
         {
             switch (lightMode) {
                 case LIGHT_MODE_BRIGHT:

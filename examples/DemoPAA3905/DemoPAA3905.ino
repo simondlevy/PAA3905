@@ -39,8 +39,8 @@ static const uint8_t CS_PIN  = 5;
 static const uint8_t MOT_PIN = 32; 
 
 // Sensor configuration
-static const PAA3905::detection_mode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
-static const PAA3905::auto_mode_t AUTO_MODE           = PAA3905::AUTO_MODE_01;
+static const PAA3905::detectionMode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
+static const PAA3905::autoMode_t AUTO_MODE           = PAA3905::AUTO_MODE_01;
 static const PAA3905::orientation_t ORIENTATION       = PAA3905::ORIENTATION_NORMAL;
 static const uint8_t RESOLUTION                       = 0x2A; // 0x00 to 0xFF
 
@@ -127,7 +127,7 @@ void loop()
 
         uint32_t shutter = sensor.getShutter();
 
-        PAA3905::light_mode_t lightMode = sensor.getLightMode();
+        PAA3905::lightMode_t lightMode = sensor.getLightMode();
 
         static const char * light_mode_names[4] = {"Bright", "Low", "Super-low", "Unknown"};
         Debugger::printf("\n%s light mode\n", light_mode_names[lightMode]);
