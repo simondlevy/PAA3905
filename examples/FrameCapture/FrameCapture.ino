@@ -10,11 +10,9 @@
 #include "PAA3905.h"
 #include "Debugger.hpp"
 
-// Chip-select pin
 static const uint8_t CS_PIN  = 5; 
 
-// Frame rate
-static const uint8_t FRAME_RATE = 0;
+static const uint32_t FRAME_PERIOD_MSEC = 3000;
 
 PAA3905 _sensor(CS_PIN,
         PAA3905::DETECTION_STANDARD,
@@ -35,20 +33,16 @@ void setup()
     }
 }
 
-
 void loop()
 {
-    static uint8_t iterations;
+    static uint32_t _lastCaptureMsec;
 
-    iterations++;
+    uint32_t msec = millis();
 
-    if (iterations >= 100) // capture one frame per 100 iterations (~5 sec) of navigation
-    {
-        iterations = 0;
-        Debugger::printf("\nHold camera still for frame capture!\n");
-        delay(4000);
+    if (msec - _lastCaptureMsec > FRAME_PERIOD_MSEC) {
 
-        uint32_t frameTime = millis();
+        _lastCaptureMsec = msec;
+    
         static uint8_t frameArray[1225];
 
         _sensor.enterFrameCaptureMode();   
@@ -56,7 +50,7 @@ void loop()
      
         _sensor.exitFrameCaptureMode(); // exit fram capture mode
 
-        Debugger::printf("Frame time = %d ms\n", millis() - frameTime);
+        Debugger::printf("Frame time = %d ms\n", millis() - _lastCaptureMsec);
 
         for (uint8_t j = 0; j < 35; j++) {
             Serial.print(j); Serial.print(" "); 
@@ -69,7 +63,7 @@ void loop()
         Serial.println(" ");
 
         _sensor.exitFrameCaptureMode(); // exit fram capture mode
-        Debugger::printf("Frame time = %d ms\n", millis() - frameTime);
+        Debugger::printf("Frame time = %d ms\n", millis() - _lastCaptureMsec);
 
         static const PAA3905::detectionMode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
         static const PAA3905::autoMode_t AUTO_MODE           = PAA3905::AUTO_MODE_01;
