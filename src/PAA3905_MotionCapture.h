@@ -10,33 +10,11 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-class PAA3905_MotionCapture {
+#include "PAA3905.h"
+
+class PAA3905_MotionCapture : public PAA3905 {
 
     public:
-
-        typedef enum {
-            LIGHT_MODE_BRIGHT,
-            LIGHT_MODE_LOW,
-            LIGHT_MODE_SUPERLOW,
-            LIGHT_MODE_UNKNOWN
-        } lightMode_t;
-
-        typedef enum {
-            DETECTION_STANDARD,
-            DETECTION_ENHANCED
-        } detectionMode_t;
-
-        typedef enum {
-            AUTO_MODE_01,
-            AUTO_MODE_012,
-        } autoMode_t;
-
-        typedef enum {
-            ORIENTATION_NORMAL  = 0x00,
-            ORIENTATION_XINVERT = 0x80,
-            ORIENTATION_YINVERT = 0x40,
-            ORIENTATION_SWAP    = 0x20,
-        } orientation_t;
 
         PAA3905_MotionCapture(uint8_t cspin,
                 detectionMode_t detectionMode, 

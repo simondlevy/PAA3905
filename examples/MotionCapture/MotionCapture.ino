@@ -15,9 +15,9 @@ static const uint8_t CS_PIN  = 5;
 static const uint8_t MOT_PIN = 32; 
 
 PAA3905_MotionCapture _sensor(CS_PIN,
-        PAA3905_MotionCapture::DETECTION_STANDARD,
-        PAA3905_MotionCapture::AUTO_MODE_01,
-        PAA3905_MotionCapture::ORIENTATION_NORMAL,
+        PAA3905::DETECTION_STANDARD,
+        PAA3905::AUTO_MODE_01,
+        PAA3905::ORIENTATION_NORMAL,
         0x2A); // resolution 0x00 to 0xFF
 
 static volatile bool gotMotionInterrupt;

@@ -1,4 +1,4 @@
-/* PAA3905_FrameCapture Optical Flow Sensor
+/* PAA3905_Motion Optical Flow Sensor
  *
  * Copyright (c) 2021 Tlera Corporation and Simon D. Levy
  *
@@ -10,21 +10,35 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-#include "PAA3905.h"
-
-class PAA3905_FrameCapture : public PAA3905 {
+class PAA3905 {
 
     public:
 
-        PAA3905_FrameCapture(uint8_t cspin,
-                orientation_t orientation,
-                uint8_t resolution)
-        { 
-            m_csPin = cspin;
-            m_orientation = orientation;
-            m_resolution = resolution;
-        }
+        typedef enum {
+            LIGHT_MODE_BRIGHT,
+            LIGHT_MODE_LOW,
+            LIGHT_MODE_SUPERLOW,
+            LIGHT_MODE_UNKNOWN
+        } lightMode_t;
 
+        typedef enum {
+            DETECTION_STANDARD,
+            DETECTION_ENHANCED
+        } detectionMode_t;
+
+        typedef enum {
+            AUTO_MODE_01,
+            AUTO_MODE_012,
+        } autoMode_t;
+
+        typedef enum {
+            ORIENTATION_NORMAL  = 0x00,
+            ORIENTATION_XINVERT = 0x80,
+            ORIENTATION_YINVERT = 0x40,
+            ORIENTATION_SWAP    = 0x20,
+        } orientation_t;
+
+        /*
         bool begin(void) 
         {
             // Configure SPI Flash chip select
@@ -48,6 +62,8 @@ class PAA3905_FrameCapture : public PAA3905 {
             // Return all registers to default before configuring
             reset(); 
 
+            setMode(m_detectionMode, m_autoMode);
+
             setResolution(m_resolution);        
 
             setOrientation(m_orientation);
@@ -59,38 +75,62 @@ class PAA3905_FrameCapture : public PAA3905 {
                 readByte(INVERSE_PRODUCT_ID) == 0x5D;
         }
 
-        void captureFrame(uint8_t * frameArray)
-        {  
-            // make sure not in superlowlight mode for frame capture
-            setMode(DETECTION_STANDARD, AUTO_MODE_01); 
+    private:
 
-            writeByteDelay(0x7F, 0x00);
-            writeByteDelay(0x67, 0x25);
-            writeByteDelay(0x55, 0x20);
-            writeByteDelay(0x7F, 0x13);
-            writeByteDelay(0x42, 0x01);
-            writeByteDelay(0x7F, 0x00);
-            writeByteDelay(0x0F, 0x11);
-            writeByteDelay(0x0F, 0x13);
-            writeByteDelay(0x0F, 0x11);
+        void setMode(uint8_t mode, uint8_t autoMode) 
+        {
+            reset();
 
-            uint8_t tempStatus = 0;
+            switch(mode) {
+                case 0: // standard detection
+                    standardDetection();
+                    break;
 
-            // wait for grab status bit 0 to equal 1
-            while( !(tempStatus & 0x01) ) {
-                tempStatus = readByte(RAWDATA_GRAB_STATUS); 
-            } 
-
-            writeByteDelay(RAWDATA_GRAB, 0xFF); // start frame capture mode
-
-            for (uint8_t ii = 0; ii < 35; ii++) {
-
-                for (uint8_t jj = 0; jj < 35; jj++) {
-
-                    // read the 1225 data into array
-                    frameArray[ii*35 + jj] = readByte(RAWDATA_GRAB); 
-                }
+                case 1: // enhanced detection
+                    enhancedDetection();
+                    break;
             }
+
+            if (autoMode == AUTO_MODE_012){
+                writeByteDelay(0x7F, 0x08);
+                writeByteDelay(0x68, 0x02);
+                writeByteDelay(0x7F, 0x00);
+            }
+            else
+            {
+                writeByteDelay(0x7F, 0x08);
+                writeByteDelay(0x68, 0x01);
+                writeByteDelay(0x7F, 0x00);
+            }
+        }
+
+        void setOrientation(uint8_t orient) 
+        {
+            writeByte(ORIENTATION, orient);
+        }
+
+        void setResolution(uint8_t res) 
+        {
+            writeByte(RESOLUTION, res);
+        }
+
+        void reset()
+        {
+            // Power up reset
+            writeByte(POWER_UP_RESET, 0x5A);
+            delay(1); 
+            // Read the motion registers one time to clear
+            for (uint8_t ii = 0; ii < 5; ii++)
+            {
+                readByte(MOTION + ii);
+                delayMicroseconds(2);
+            }
+        }
+
+        void shutdown()
+        {
+            // Enter shutdown mode
+            writeByte(SHUTDOWN, 0xB6);
         }
 
     private:
@@ -126,57 +166,7 @@ class PAA3905_FrameCapture : public PAA3905 {
         uint8_t         m_resolution;
         uint8_t         m_data[14];
 
-        void setResolution(uint8_t res) 
-        {
-            writeByte(RESOLUTION, res);
-        }
-
-        void setOrientation(uint8_t orient) 
-        {
-            writeByte(ORIENTATION, orient);
-        }
-
-        void setMode(uint8_t mode, uint8_t autoMode) 
-        {
-            reset();
-
-            switch(mode) {
-                case 0: // standard detection
-                    standardDetection();
-                    break;
-
-                case 1: // enhanced detection
-                    enhancedDetection();
-                    break;
-            }
-
-            if (autoMode == AUTO_MODE_012){
-                writeByteDelay(0x7F, 0x08);
-                writeByteDelay(0x68, 0x02);
-                writeByteDelay(0x7F, 0x00);
-            }
-            else
-            {
-                writeByteDelay(0x7F, 0x08);
-                writeByteDelay(0x68, 0x01);
-                writeByteDelay(0x7F, 0x00);
-            }
-        }
-
-        void reset()
-        {
-            // Power up reset
-            writeByte(POWER_UP_RESET, 0x5A);
-            delay(1); 
-            // Read the motion registers one time to clear
-            for (uint8_t ii = 0; ii < 5; ii++)
-            {
-                readByte(MOTION + ii);
-                delayMicroseconds(2);
-            }
-        }
-
-         void writeByte(uint8_t reg, uint8_t value) 
+        void writeByte(uint8_t reg, uint8_t value) 
         {
             SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
             digitalWrite(m_csPin, LOW);
@@ -366,5 +356,6 @@ class PAA3905_FrameCapture : public PAA3905 {
             writeByteDelay(0x7F, 0x00);
             writeByteDelay(0x67, 0xA5);
         }
+        */
  
-}; // class PAA3905_FrameCapture
+}; // class PAA3905
