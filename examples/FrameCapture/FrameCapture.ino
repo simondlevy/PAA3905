@@ -10,9 +10,11 @@
 #include "PAA3905.h"
 #include "Debugger.hpp"
 
-// Pins
+// Chip-select pin
 static const uint8_t CS_PIN  = 5; 
-static const uint8_t MOT_PIN = 32; 
+
+// Frame rate
+static const uint8_t FRAME_RATE = 0;
 
 PAA3905 _sensor(CS_PIN,
         PAA3905::DETECTION_STANDARD,
@@ -20,35 +22,18 @@ PAA3905 _sensor(CS_PIN,
         PAA3905::ORIENTATION_NORMAL,
         0x2A); // resolution 0x00 to 0xFF
 
-static volatile bool gotMotionInterrupt;
-
-void motionInterruptHandler()
-{
-    gotMotionInterrupt = true;
-}
-
 void setup() 
 {
     Serial.begin(115200);
 
-    delay(4000);
-
     // Start SPI
     SPI.begin();
-
-    delay(1000);
 
     // Check device ID as a test of SPI communications
     if (!_sensor.begin()) {
         Debugger::reportForever("PAA3905 initialization failed");
     }
-
-    Debugger::printf("Resolution is %0.1f CPI per meter height\n", _sensor.getResolution());
-
-    pinMode(MOT_PIN, INPUT); // data ready interrupt
-    attachInterrupt(MOT_PIN, motionInterruptHandler, FALLING); // data ready interrupt active LOW 
-
-} // setup
+}
 
 
 void loop()
@@ -57,15 +42,6 @@ void loop()
 
     iterations++;
 
-    // Navigation
-    if (gotMotionInterrupt) {
-
-        gotMotionInterrupt = false;
-
-        _sensor.readBurstMode(); // use burst mode to read all of the data
-    }
-
-    // Frame capture
     if (iterations >= 100) // capture one frame per 100 iterations (~5 sec) of navigation
     {
         iterations = 0;
@@ -102,15 +78,15 @@ void loop()
 
         // Return to navigation mode
         _sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
+
         delay(50);
+
         _sensor.setMode(DETECTION_MODE, AUTO_MODE); // set modes
         _sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
         _sensor.setOrientation(ORIENTATION);
         _sensor.clearInterrupt();
         Debugger::printf("Back in Navigation mode!\n");
     }
-
-    delay(50); // limit reporting to 20 Hz
 
 } // loop
 
