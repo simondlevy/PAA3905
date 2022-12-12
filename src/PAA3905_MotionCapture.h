@@ -20,12 +20,10 @@ class PAA3905_MotionCapture : public PAA3905 {
                 detectionMode_t detectionMode, 
                 autoMode_t autoMode,     
                 orientation_t orientation,
-                uint8_t resolution) : PAA3905(csPin)
+                uint8_t resolution) : PAA3905(csPin, orientation, resolution)
         { 
             m_detectionMode = detectionMode; 
             m_autoMode = autoMode;     
-            m_orientation = orientation;
-            m_resolution = resolution;
         }
 
         bool begin(void) 
@@ -93,7 +91,6 @@ class PAA3905_MotionCapture : public PAA3905 {
 
             SPI.endTransaction();
         }
-
 
         bool motionDataAvailable(void)
         {
@@ -267,8 +264,6 @@ class PAA3905_MotionCapture : public PAA3905 {
 
         detectionMode_t m_detectionMode; 
         autoMode_t      m_autoMode; 
-        orientation_t   m_orientation;
-        uint8_t         m_resolution;
         uint8_t         m_data[14];
 
         // Performance optimization registers for the three different modes

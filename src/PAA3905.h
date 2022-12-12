@@ -81,9 +81,11 @@ class PAA3905 {
         static const uint8_t RESOLUTION            = 0x4E;
         static const uint8_t ORIENTATION           = 0x5B;
 
-        PAA3905(uint8_t csPin)
+        PAA3905(uint8_t csPin, orientation_t orientation, uint8_t resolution)
         { 
             m_csPin = csPin;
+            m_orientation = orientation;
+            m_resolution = resolution;
         }
 
         void setResolution(uint8_t res) 
@@ -183,7 +185,9 @@ class PAA3905 {
         uint8_t         m_data[14];
         */
 
-        uint8_t m_csPin;
+        uint8_t       m_csPin;
+        orientation_t m_orientation;
+        uint8_t       m_resolution;
 
         void writeByte(uint8_t reg, uint8_t value) 
         {

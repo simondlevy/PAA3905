@@ -16,12 +16,9 @@ class PAA3905_FrameCapture : public PAA3905 {
 
     public:
 
-        PAA3905_FrameCapture(uint8_t csPin,
-                orientation_t orientation,
-                uint8_t resolution) : PAA3905(csPin)
+        PAA3905_FrameCapture(uint8_t csPin, orientation_t orientation, uint8_t resolution) 
+            : PAA3905(csPin, orientation, resolution)
         { 
-            m_orientation = orientation;
-            m_resolution = resolution;
         }
 
         bool begin(void) 
@@ -118,8 +115,6 @@ class PAA3905_FrameCapture : public PAA3905 {
 
         detectionMode_t m_detectionMode; 
         autoMode_t      m_autoMode; 
-        orientation_t   m_orientation;
-        uint8_t         m_resolution;
         uint8_t         m_data[14];
 
         void setMode(uint8_t mode, uint8_t autoMode) 
@@ -302,16 +297,5 @@ class PAA3905_FrameCapture : public PAA3905 {
             writeByteDelay(0x5B, 0xA0); // 60
 
         } // enhancedDetection
-
-        // XXX useful?
-        void exitFrameCaptureMode()
-        {
-            writeByteDelay(0x7F, 0x00);
-            writeByteDelay(0x55, 0x00);
-            writeByteDelay(0x7F, 0x13);
-            writeByteDelay(0x42, 0x00);
-            writeByteDelay(0x7F, 0x00);
-            writeByteDelay(0x67, 0xA5);
-        }
  
 }; // class PAA3905_FrameCapture
