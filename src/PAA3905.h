@@ -73,6 +73,16 @@ class PAA3905 {
 
             return readByte(PAA3905_PRODUCT_ID) == 0xA2 &&
                 readByte(PAA3905_INVERSE_PRODUCT_ID) == 0x5D;
+
+            // Return all registers to default before configuring
+            reset(); 
+
+            setMode(m_detectionMode, m_autoMode);
+
+            setResolution(m_resolution);        
+
+            setOrientation(m_orientation);
+
         }
 
         uint8_t status()
@@ -352,12 +362,12 @@ class PAA3905 {
         static const uint8_t PAA3905_ORIENTATION           = 0x5B;
         static const uint8_t PAA3905_INVERSE_PRODUCT_ID    = 0x5F ;// default value = 0x5D
 
-        uint8_t m_csPin;
+        uint8_t         m_csPin;
         detectionMode_t m_detectionMode; 
-        autoMode_t m_autoMode; 
-        orientation_t m_orientation;
-        uint8_t m_resolution;
-        uint8_t m_data[14];
+        autoMode_t      m_autoMode; 
+        orientation_t   m_orientation;
+        uint8_t         m_resolution;
+        uint8_t         m_data[14];
 
         void writeByte(uint8_t reg, uint8_t value) 
         {

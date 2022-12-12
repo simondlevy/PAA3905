@@ -70,18 +70,11 @@ void setup()
 
     // Check device ID as a test of SPI communications
     if (!_sensor.begin()) {
-        Debugger::reportForever("Initialization failed");
+        Debugger::reportForever("PAA3905 initialization failed");
     }
-
-    _sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
-
-    _sensor.setMode(DETECTION_MODE, AUTO_MODE);         // set modes
-
-    _sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
 
     Debugger::printf("Resolution is %0.1f CPI per meter height\n", _sensor.getResolution());
 
-    _sensor.setOrientation(ORIENTATION);
     uint8_t orientation = _sensor.getOrientation();
 
     if (orientation & PAA3905::ORIENTATION_XINVERT) {
