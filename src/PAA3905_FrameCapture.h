@@ -91,6 +91,12 @@ class PAA3905_FrameCapture : public PAA3905 {
 
     private:
 
+        static const uint8_t RAWDATA_SUM           = 0x08;
+        static const uint8_t MAX_RAWDATA           = 0x09;
+        static const uint8_t MIN_RAWDATA           = 0x0A;
+        static const uint8_t RAWDATA_GRAB_STATUS   = 0x10;
+        static const uint8_t RAWDATA_GRAB          = 0x13;
+
         void setMode(uint8_t mode, uint8_t autoMode) 
         {
             reset();
