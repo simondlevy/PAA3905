@@ -16,8 +16,8 @@ class PAA3905_FrameCapture : public PAA3905 {
 
     public:
 
-        PAA3905_FrameCapture(uint8_t csPin, orientation_t orientation, uint8_t resolution) 
-            : PAA3905(csPin, orientation, resolution)
+        PAA3905_FrameCapture(SPIClass & spi, uint8_t csPin, orientation_t orientation, uint8_t resolution) 
+            : PAA3905(spi, csPin, orientation, resolution)
         { 
         }
 

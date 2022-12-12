@@ -46,7 +46,7 @@ class PAA3905 {
 
             // Setup SPI port
             // 2 MHz max SPI clock frequency
-            SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3)); 
+            m_spi->beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3)); 
 
             // Make sure the SPI bus is reset
             digitalWrite(m_csPin, HIGH);
@@ -56,7 +56,7 @@ class PAA3905 {
             digitalWrite(m_csPin, HIGH);
             delay(1);
 
-            SPI.endTransaction();
+            m_spi->endTransaction();
 
             // Return all registers to default before configuring
             reset(); 
@@ -82,8 +82,9 @@ class PAA3905 {
 
         uint8_t m_csPin;
 
-        PAA3905(uint8_t csPin, orientation_t orientation, uint8_t resolution)
+        PAA3905(SPIClass & spi, uint8_t csPin, orientation_t orientation, uint8_t resolution)
         { 
+            m_spi = &spi;
             m_csPin = csPin;
             m_orientation = orientation;
             m_resolution = resolution;
@@ -120,17 +121,17 @@ class PAA3905 {
 
         void writeByte(uint8_t reg, uint8_t value) 
         {
-            SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
+            m_spi->beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
             digitalWrite(m_csPin, LOW);
             delayMicroseconds(1);
 
-            SPI.transfer(reg | 0x80);
+            m_spi->transfer(reg | 0x80);
             delayMicroseconds(10);
-            SPI.transfer(value);
+            m_spi->transfer(value);
             delayMicroseconds(1);
 
             digitalWrite(m_csPin, HIGH);
-            SPI.endTransaction();
+            m_spi->endTransaction();
         }
 
         void writeByteDelay(uint8_t reg, uint8_t value)
@@ -141,18 +142,18 @@ class PAA3905 {
 
         uint8_t readByte(uint8_t reg) 
         {
-            SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
+            m_spi->beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE3));
             digitalWrite(m_csPin, LOW);
             delayMicroseconds(1);
 
-            SPI.transfer(reg & 0x7F);
+            m_spi->transfer(reg & 0x7F);
             delayMicroseconds(2);
 
-            uint8_t temp = SPI.transfer(0);
+            uint8_t temp = m_spi->transfer(0);
             delayMicroseconds(1);
 
             digitalWrite(m_csPin, HIGH);
-            SPI.endTransaction();
+            m_spi->endTransaction();
 
             return temp;
         }
@@ -180,7 +181,10 @@ class PAA3905 {
         static const uint8_t ORIENTATION         = 0x5B;
         static const uint8_t INVERSE_PRODUCT_ID  = 0x5F ;// default value = 0x5D
 
+        SPIClass * m_spi;
+
         orientation_t m_orientation;
+
         uint8_t       m_resolution;
 
         void setResolution(uint8_t res) 

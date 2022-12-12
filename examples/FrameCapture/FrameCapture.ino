@@ -16,7 +16,7 @@ static const uint32_t FRAME_PERIOD_MSEC = 3000;
 
 static const uint8_t RESOLUTION = 0x2A;
 
-PAA3905_FrameCapture _sensor(CS_PIN, PAA3905::ORIENTATION_NORMAL, RESOLUTION);
+PAA3905_FrameCapture _sensor(SPI, CS_PIN, PAA3905::ORIENTATION_NORMAL, RESOLUTION);
 
 void setup() 
 {

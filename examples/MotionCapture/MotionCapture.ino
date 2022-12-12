@@ -14,7 +14,9 @@
 static const uint8_t CS_PIN  = 5; 
 static const uint8_t MOT_PIN = 32; 
 
-PAA3905_MotionCapture _sensor(CS_PIN,
+PAA3905_MotionCapture _sensor(
+        SPI,
+        CS_PIN,
         PAA3905::DETECTION_STANDARD,
         PAA3905::AUTO_MODE_01,
         PAA3905::ORIENTATION_NORMAL,
