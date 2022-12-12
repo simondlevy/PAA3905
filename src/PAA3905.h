@@ -189,7 +189,7 @@ class PAA3905 {
 
         orientation_t m_orientation;
 
-        uint8_t       m_resolution;
+        uint8_t m_resolution;
 
         void setResolution(const uint8_t res) 
         {

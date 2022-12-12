@@ -144,18 +144,21 @@ class PAA3905_MotionCapture : public PAA3905 {
 
     private:
 
-        static const uint8_t DELTA_X_L    = 0x03;
-        static const uint8_t DELTA_X_H    = 0x04;
-        static const uint8_t DELTA_Y_L    = 0x05;
-        static const uint8_t DELTA_Y_H    = 0x06;
-        static const uint8_t SQUAL        = 0x07;
-        static const uint8_t SHUTTER_L    = 0x0B;
-        static const uint8_t SHUTTER_M    = 0x0C;
-        static const uint8_t SHUTTER_H    = 0x0D;
-        static const uint8_t MOTION_BURST = 0x16;
+       enum {
 
-        detectionMode_t m_detectionMode; 
-        autoMode_t      m_autoMode; 
-        uint8_t         m_data[14];
+           DELTA_X_L    = 0x03,
+           DELTA_X_H    = 0x04,
+           DELTA_Y_L    = 0x05,
+           DELTA_Y_H    = 0x06,
+           SQUAL        = 0x07,
+           SHUTTER_L    = 0x0B,
+           SHUTTER_M    = 0x0C,
+           SHUTTER_H    = 0x0D,
+           MOTION_BURST = 0x16
+       };
+
+       detectionMode_t m_detectionMode; 
+       autoMode_t      m_autoMode; 
+       uint8_t         m_data[14];
 
 }; // class PAA3905_Motion
