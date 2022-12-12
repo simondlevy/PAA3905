@@ -44,7 +44,7 @@ static const PAA3905::autoMode_t AUTO_MODE           = PAA3905::AUTO_MODE_01;
 static const PAA3905::orientation_t ORIENTATION       = PAA3905::ORIENTATION_NORMAL;
 static const uint8_t RESOLUTION                       = 0x2A; // 0x00 to 0xFF
 
-PAA3905 sensor(CS_PIN);
+PAA3905 _sensor(CS_PIN);
 
 static volatile bool gotMotionInterrupt;
 
@@ -65,20 +65,20 @@ void setup()
     delay(1000);
 
     // Check device ID as a test of SPI communications
-    if (!sensor.begin()) {
-        Debugger::reportForever("Initialization of the sensor sensor failed");
+    if (!_sensor.begin()) {
+        Debugger::reportForever("Initialization failed");
     }
 
-    sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
+    _sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
 
-    sensor.setMode(DETECTION_MODE, AUTO_MODE);         // set modes
+    _sensor.setMode(DETECTION_MODE, AUTO_MODE);         // set modes
 
-    sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
+    _sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
 
-    Debugger::printf("Resolution is %0.1f CPI per meter height\n", sensor.getResolution());
+    Debugger::printf("Resolution is %0.1f CPI per meter height\n", _sensor.getResolution());
 
-    sensor.setOrientation(ORIENTATION);
-    uint8_t orientation = sensor.getOrientation();
+    _sensor.setOrientation(ORIENTATION);
+    uint8_t orientation = _sensor.getOrientation();
     if (orientation & PAA3905::ORIENTATION_XINVERT) {
         Debugger::printf("X direction inverted!\n");
     }
@@ -92,7 +92,7 @@ void setup()
     pinMode(MOT_PIN, INPUT); // data ready interrupt
     attachInterrupt(MOT_PIN, motionInterruptHandler, FALLING); // data ready interrupt active LOW 
 
-    sensor.status();          // clear interrupt before entering main loop
+    _sensor.status();          // clear interrupt before entering main loop
 
 } // setup
 
@@ -108,32 +108,32 @@ void loop()
 
         gotMotionInterrupt = false;
 
-        sensor.readBurstMode(); // use burst mode to read all of the data
+        _sensor.readBurstMode(); // use burst mode to read all of the data
     }
 
-    if (sensor.motionDataAvailable()) { 
+    if (_sensor.motionDataAvailable()) { 
 
-        if (sensor.challengingSurfaceDetected()) {
+        if (_sensor.challengingSurfaceDetected()) {
             Debugger::printf("Challenging surface detected!\n");
         }
 
-        int16_t deltaX = sensor.getDeltaX();
-        int16_t deltaY = sensor.getDeltaY();
+        int16_t deltaX = _sensor.getDeltaX();
+        int16_t deltaY = _sensor.getDeltaY();
 
-        uint8_t surfaceQuality = sensor.getSurfaceQuality();
-        uint8_t rawDataSum = sensor.getRawDataSum();
-        uint8_t rawDataMax = sensor.getRawDataMax();
-        uint8_t rawDataMin = sensor.getRawDataMin();
+        uint8_t surfaceQuality = _sensor.getSurfaceQuality();
+        uint8_t rawDataSum = _sensor.getRawDataSum();
+        uint8_t rawDataMax = _sensor.getRawDataMax();
+        uint8_t rawDataMin = _sensor.getRawDataMin();
 
-        uint32_t shutter = sensor.getShutter();
+        uint32_t shutter = _sensor.getShutter();
 
-        PAA3905::lightMode_t lightMode = sensor.getLightMode();
+        PAA3905::lightMode_t lightMode = _sensor.getLightMode();
 
         static const char * light_mode_names[4] = {"Bright", "Low", "Super-low", "Unknown"};
         Debugger::printf("\n%s light mode\n", light_mode_names[lightMode]);
 
         // Don't report X,Y if surface quality and shutter are under thresholds
-        if (sensor.dataAboveThresholds(lightMode, surfaceQuality, shutter)) {
+        if (_sensor.dataAboveThresholds(lightMode, surfaceQuality, shutter)) {
             Debugger::printf("X: %d  Y: %d\n", deltaX, deltaY);
         }
         else {
@@ -155,9 +155,9 @@ void loop()
 
         uint32_t frameTime = millis();
         static uint8_t frameArray[1225];
-        sensor.enterFrameCaptureMode();   
-        sensor.captureFrame(frameArray);
-        sensor.exitFrameCaptureMode(); // exit fram capture mode
+        _sensor.enterFrameCaptureMode();   
+        _sensor.captureFrame(frameArray);
+        _sensor.exitFrameCaptureMode(); // exit fram capture mode
         Debugger::printf("Frame time = %d ms\n", millis() - frameTime);
 
         for (uint8_t ii = 0; ii < 35; ii++) {
@@ -170,16 +170,16 @@ void loop()
         }
         Serial.println(" ");
 
-        sensor.exitFrameCaptureMode(); // exit fram capture mode
+        _sensor.exitFrameCaptureMode(); // exit fram capture mode
         Debugger::printf("Frame time = %d ms\n", millis() - frameTime);
 
         // Return to navigation mode
-        sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
+        _sensor.reset(); // Reset PAA3905 to return all registers to default before configuring
         delay(50);
-        sensor.setMode(DETECTION_MODE, AUTO_MODE); // set modes
-        sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
-        sensor.setOrientation(ORIENTATION);
-        sensor.status();          // clear interrupt before entering main loop
+        _sensor.setMode(DETECTION_MODE, AUTO_MODE); // set modes
+        _sensor.setResolution(RESOLUTION);         // set resolution fraction of default 0x2A
+        _sensor.setOrientation(ORIENTATION);
+        _sensor.status();          // clear interrupt before entering main loop
         Debugger::printf("Back in Navigation mode!\n");
     }
 
