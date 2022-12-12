@@ -53,16 +53,19 @@ void loop()
         Debugger::printf("Frame time = %d ms\n", millis() - _lastCaptureMsec);
 
         for (uint8_t j = 0; j < 35; j++) {
-            Serial.print(j); Serial.print(" "); 
-            for (uint8_t k = 0; k < 35; k++)
-            {
-                Serial.print(frameArray[j*35 + k]); Serial.print(" ");  
-            }
-            Serial.println(" ");
-        }
-        Serial.println(" ");
+            Debugger::printf("%2d ", j);
+            for (uint8_t k = 0; k < 35; k++) {
 
-        _sensor.exitFrameCaptureMode(); // exit fram capture mode
+                // Debugger::printf() would be too slow here
+                Serial.print(frameArray[j*35 + k]);
+                Serial.print(" ");  
+            }
+            Debugger::printf("\n");
+        }
+        Debugger::printf("\n");
+
+        _sensor.exitFrameCaptureMode(); 
+
         Debugger::printf("Frame time = %d ms\n", millis() - _lastCaptureMsec);
 
         static const PAA3905::detectionMode_t DETECTION_MODE = PAA3905::DETECTION_STANDARD;
