@@ -81,19 +81,19 @@ class PAA3905_MotionCapture {
             setOrientation(m_orientation);
 
             // Clear interrupt
-            readByte(PAA3905_Motion_MOTION); // clears motion interrupt
+            readByte(MOTION); // clears motion interrupt
 
-            return readByte(PAA3905_Motion_PRODUCT_ID) == 0xA2 &&
-                readByte(PAA3905_Motion_INVERSE_PRODUCT_ID) == 0x5D;
+            return readByte(PRODUCT_ID) == 0xA2 &&
+                readByte(INVERSE_PRODUCT_ID) == 0x5D;
         }
 
-        void readMotionCount(int16_t *deltaX, int16_t *deltaY, uint8_t *SQUAL, uint32_t *Shutter)
+        void readMotionCount(int16_t *deltaX, int16_t *deltaY, uint8_t *squal, uint32_t *Shutter)
         {
-            *deltaX =  ((int16_t) readByte(PAA3905_Motion_DELTA_X_H) << 8) | readByte(PAA3905_Motion_DELTA_X_L);
-            *deltaY =  ((int16_t) readByte(PAA3905_Motion_DELTA_Y_H) << 8) | readByte(PAA3905_Motion_DELTA_X_L);
-            *SQUAL =   readByte(PAA3905_Motion_SQUAL);
-            *Shutter = ((uint32_t)readByte(PAA3905_Motion_SHUTTER_H) << 16) |
-                ((uint32_t)readByte(PAA3905_Motion_SHUTTER_M) << 8) | readByte(PAA3905_Motion_SHUTTER_L);
+            *deltaX =  ((int16_t) readByte(DELTA_X_H) << 8) | readByte(DELTA_X_L);
+            *deltaY =  ((int16_t) readByte(DELTA_Y_H) << 8) | readByte(DELTA_X_L);
+            *squal =   readByte(SQUAL);
+            *Shutter = ((uint32_t)readByte(SHUTTER_H) << 16) |
+                ((uint32_t)readByte(SHUTTER_M) << 8) | readByte(SHUTTER_L);
         }
 
         void readBurstMode(void)
@@ -103,7 +103,7 @@ class PAA3905_MotionCapture {
             digitalWrite(m_csPin, LOW);
             delayMicroseconds(1);
 
-            SPI.transfer(PAA3905_Motion_MOTION_BURST); // start burst mode
+            SPI.transfer(MOTION_BURST); // start burst mode
             digitalWrite(MOSI, HIGH); // hold MOSI high during burst read
             delayMicroseconds(2);
 
@@ -193,28 +193,28 @@ class PAA3905_MotionCapture {
 
         void setOrientation(uint8_t orient) 
         {
-            writeByte(PAA3905_Motion_ORIENTATION, orient);
+            writeByte(ORIENTATION, orient);
         }
 
         void setResolution(uint8_t res) 
         {
-            writeByte(PAA3905_Motion_RESOLUTION, res);
+            writeByte(RESOLUTION, res);
         }
 
         float getResolution() 
         {
-            return (readByte(PAA3905_Motion_RESOLUTION) + 1) * 200.0f / 8600 * 11.914;
+            return (readByte(RESOLUTION) + 1) * 200.0f / 8600 * 11.914;
         }
 
         void reset()
         {
             // Power up reset
-            writeByte(PAA3905_Motion_POWER_UP_RESET, 0x5A);
+            writeByte(POWER_UP_RESET, 0x5A);
             delay(1); 
             // Read the motion registers one time to clear
             for (uint8_t ii = 0; ii < 5; ii++)
             {
-                readByte(PAA3905_Motion_MOTION + ii);
+                readByte(MOTION + ii);
                 delayMicroseconds(2);
             }
         }
@@ -222,7 +222,7 @@ class PAA3905_MotionCapture {
         void shutdown()
         {
             // Enter shutdown mode
-            writeByte(PAA3905_Motion_SHUTDOWN, 0xB6);
+            writeByte(SHUTDOWN, 0xB6);
         }
 
         void powerup()
@@ -232,9 +232,9 @@ class PAA3905_MotionCapture {
             digitalWrite(m_csPin, LOW); // reset the SPI port
             delay(1);
             // Wakeup
-            writeByte(PAA3905_Motion_SHUTDOWN, 0xC7); // exit shutdown mode
+            writeByte(SHUTDOWN, 0xC7); // exit shutdown mode
             delay(1);
-            writeByte(PAA3905_Motion_SHUTDOWN, 0x00); // clear shutdown register
+            writeByte(SHUTDOWN, 0x00); // clear shutdown register
             delay(1);
             // Read the motion registers one time to clear
             for (uint8_t ii = 0; ii < 5; ii++)
@@ -247,40 +247,6 @@ class PAA3905_MotionCapture {
         lightMode_t getLightMode() 
         {
             return (lightMode_t)((m_data[1] & 0xC0) >> 6);  // mode is bits 6 and 7 
-        }
-
-        void captureFrame(uint8_t * frameArray)
-        {  
-            // make sure not in superlowlight mode for frame capture
-            setMode(DETECTION_STANDARD, AUTO_MODE_01); 
-
-            writeByteDelay(0x7F, 0x00);
-            writeByteDelay(0x67, 0x25);
-            writeByteDelay(0x55, 0x20);
-            writeByteDelay(0x7F, 0x13);
-            writeByteDelay(0x42, 0x01);
-            writeByteDelay(0x7F, 0x00);
-            writeByteDelay(0x0F, 0x11);
-            writeByteDelay(0x0F, 0x13);
-            writeByteDelay(0x0F, 0x11);
-
-            uint8_t tempStatus = 0;
-
-            // wait for grab status bit 0 to equal 1
-            while( !(tempStatus & 0x01) ) {
-                tempStatus = readByte(PAA3905_Motion_RAWDATA_GRAB_STATUS); 
-            } 
-
-            writeByteDelay(PAA3905_Motion_RAWDATA_GRAB, 0xFF); // start frame capture mode
-
-            for (uint8_t ii = 0; ii < 35; ii++) {
-
-                for (uint8_t jj = 0; jj < 35; jj++) {
-
-                    // read the 1225 data into array
-                    frameArray[ii*35 + jj] = readByte(PAA3905_Motion_RAWDATA_GRAB); 
-                }
-            }
         }
 
        bool dataAboveThresholds(lightMode_t lightMode, uint8_t surfaceQuality, uint32_t shutter)
@@ -310,29 +276,29 @@ class PAA3905_MotionCapture {
 
     private:
 
-        static const uint8_t PAA3905_Motion_PRODUCT_ID            = 0x00; // default value = 0xA2
-        static const uint8_t PAA3905_Motion_REVISION_ID           = 0x01;
-        static const uint8_t PAA3905_Motion_MOTION                = 0x02;
-        static const uint8_t PAA3905_Motion_DELTA_X_L             = 0x03;
-        static const uint8_t PAA3905_Motion_DELTA_X_H             = 0x04;
-        static const uint8_t PAA3905_Motion_DELTA_Y_L             = 0x05;
-        static const uint8_t PAA3905_Motion_DELTA_Y_H             = 0x06;
-        static const uint8_t PAA3905_Motion_SQUAL                 = 0x07;
-        static const uint8_t PAA3905_Motion_RAWDATA_SUM           = 0x08;
-        static const uint8_t PAA3905_Motion_MAX_RAWDATA           = 0x09;
-        static const uint8_t PAA3905_Motion_MIN_RAWDATA           = 0x0A;
-        static const uint8_t PAA3905_Motion_SHUTTER_L             = 0x0B;
-        static const uint8_t PAA3905_Motion_SHUTTER_M             = 0x0C;
-        static const uint8_t PAA3905_Motion_SHUTTER_H             = 0x0D;
-        static const uint8_t PAA3905_Motion_RAWDATA_GRAB_STATUS   = 0x10;
-        static const uint8_t PAA3905_Motion_RAWDATA_GRAB          = 0x13;
-        static const uint8_t PAA3905_Motion_OBSERVATION           = 0x15;
-        static const uint8_t PAA3905_Motion_MOTION_BURST          = 0x16;
-        static const uint8_t PAA3905_Motion_POWER_UP_RESET        = 0x3A;
-        static const uint8_t PAA3905_Motion_SHUTDOWN              = 0x3B;
-        static const uint8_t PAA3905_Motion_RESOLUTION            = 0x4E;
-        static const uint8_t PAA3905_Motion_ORIENTATION           = 0x5B;
-        static const uint8_t PAA3905_Motion_INVERSE_PRODUCT_ID    = 0x5F ;// default value = 0x5D
+        static const uint8_t PRODUCT_ID            = 0x00; // default value = 0xA2
+        static const uint8_t REVISION_ID           = 0x01;
+        static const uint8_t MOTION                = 0x02;
+        static const uint8_t DELTA_X_L             = 0x03;
+        static const uint8_t DELTA_X_H             = 0x04;
+        static const uint8_t DELTA_Y_L             = 0x05;
+        static const uint8_t DELTA_Y_H             = 0x06;
+        static const uint8_t SQUAL                 = 0x07;
+        static const uint8_t RAWDATA_SUM           = 0x08;
+        static const uint8_t MAX_RAWDATA           = 0x09;
+        static const uint8_t MIN_RAWDATA           = 0x0A;
+        static const uint8_t SHUTTER_L             = 0x0B;
+        static const uint8_t SHUTTER_M             = 0x0C;
+        static const uint8_t SHUTTER_H             = 0x0D;
+        static const uint8_t RAWDATA_GRAB_STATUS   = 0x10;
+        static const uint8_t RAWDATA_GRAB          = 0x13;
+        static const uint8_t OBSERVATION           = 0x15;
+        static const uint8_t MOTION_BURST          = 0x16;
+        static const uint8_t POWER_UP_RESET        = 0x3A;
+        static const uint8_t SHUTDOWN              = 0x3B;
+        static const uint8_t RESOLUTION            = 0x4E;
+        static const uint8_t ORIENTATION           = 0x5B;
+        static const uint8_t INVERSE_PRODUCT_ID    = 0x5F ;// default value = 0x5D
 
         uint8_t         m_csPin;
         detectionMode_t m_detectionMode; 
