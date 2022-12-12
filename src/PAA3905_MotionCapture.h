@@ -18,11 +18,11 @@ class PAA3905_MotionCapture : public PAA3905 {
 
         PAA3905_MotionCapture(
                 SPIClass & spi,
-                uint8_t csPin,
-                detectionMode_t detectionMode, 
-                autoMode_t autoMode,     
-                orientation_t orientation,
-                uint8_t resolution) : PAA3905(spi, csPin, orientation, resolution)
+                const uint8_t csPin,
+                const detectionMode_t detectionMode, 
+                const autoMode_t autoMode,     
+                const orientation_t orientation,
+                const uint8_t resolution) : PAA3905(spi, csPin, orientation, resolution)
         { 
             m_detectionMode = detectionMode; 
             m_autoMode = autoMode;     
