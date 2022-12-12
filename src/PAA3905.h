@@ -108,7 +108,6 @@ class PAA3905 {
             writeByte(ORIENTATION, orient);
         }
 
-    /*
         void setMode(uint8_t mode, uint8_t autoMode) 
         {
             reset();
@@ -136,16 +135,6 @@ class PAA3905 {
             }
         }
 
-        void setOrientation(uint8_t orient) 
-        {
-            writeByte(ORIENTATION, orient);
-        }
-
-        void setResolution(uint8_t res) 
-        {
-            writeByte(RESOLUTION, res);
-        }
-
         void reset()
         {
             // Power up reset
@@ -164,11 +153,6 @@ class PAA3905 {
             // Enter shutdown mode
             writeByte(SHUTDOWN, 0xB6);
         }
-
-        detectionMode_t m_detectionMode; 
-        autoMode_t      m_autoMode; 
-        uint8_t         m_data[14];
-        */
 
         uint8_t       m_csPin;
         orientation_t m_orientation;
@@ -213,7 +197,6 @@ class PAA3905 {
             return temp;
         }
 
-        /*
         // Performance optimization registers for the three different modes
         void standardDetection() // default
         {
@@ -354,6 +337,8 @@ class PAA3905 {
             writeByteDelay(0x5B, 0xA0); // 60
 
         } // enhancedDetection
+
+        /*
 
         // XXX useful?
         void exitFrameCaptureMode()
