@@ -165,11 +165,6 @@ class PAA3905_MotionCapture : public PAA3905 {
             }
         }
 
-        float getResolution() 
-        {
-            return (readByte(RESOLUTION) + 1) * 200.0f / 8600 * 11.914;
-        }
-
         void reset()
         {
             // Power up reset

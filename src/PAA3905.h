@@ -76,6 +76,11 @@ class PAA3905 {
         }
         */
 
+        float getResolution() 
+        {
+            return (readByte(RESOLUTION) + 1) * 200.0f / 8600 * 11.914;
+        }
+
     protected:
 
         static const uint8_t RESOLUTION            = 0x4E;
@@ -180,8 +185,6 @@ class PAA3905 {
 
         detectionMode_t m_detectionMode; 
         autoMode_t      m_autoMode; 
-        orientation_t   m_orientation;
-        uint8_t         m_resolution;
         uint8_t         m_data[14];
         */
 
