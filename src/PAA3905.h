@@ -71,9 +71,6 @@ class PAA3905 {
 
             SPI.endTransaction();
 
-            return readByte(PAA3905_PRODUCT_ID) == 0xA2 &&
-                readByte(PAA3905_INVERSE_PRODUCT_ID) == 0x5D;
-
             // Return all registers to default before configuring
             reset(); 
 
@@ -83,6 +80,8 @@ class PAA3905 {
 
             setOrientation(m_orientation);
 
+            return readByte(PAA3905_PRODUCT_ID) == 0xA2 &&
+                readByte(PAA3905_INVERSE_PRODUCT_ID) == 0x5D;
         }
 
         uint8_t status()
