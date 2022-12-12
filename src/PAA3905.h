@@ -80,13 +80,7 @@ class PAA3905 {
 
     protected:
 
-        static const uint8_t PRODUCT_ID          = 0x00; // default value = 0xA2
-        static const uint8_t MOTION              = 0x02;
-        static const uint8_t POWER_UP_RESET      = 0x3A;
-        static const uint8_t SHUTDOWN            = 0x3B;
-        static const uint8_t RESOLUTION          = 0x4E;
-        static const uint8_t ORIENTATION         = 0x5B;
-        static const uint8_t INVERSE_PRODUCT_ID  = 0x5F ;// default value = 0x5D
+        uint8_t m_csPin;
 
         PAA3905(uint8_t csPin, orientation_t orientation, uint8_t resolution)
         { 
@@ -96,16 +90,6 @@ class PAA3905 {
         }
 
         virtual void initMode(void) = 0;
-
-        void setResolution(uint8_t res) 
-        {
-            writeByte(RESOLUTION, res);
-        }
-
-        void setOrientation(uint8_t orient) 
-        {
-            writeByte(ORIENTATION, orient);
-        }
 
         void setMode(uint8_t mode, uint8_t autoMode) 
         {
@@ -133,29 +117,6 @@ class PAA3905 {
                 writeByteDelay(0x7F, 0x00);
             }
         }
-
-        void reset()
-        {
-            // Power up reset
-            writeByte(POWER_UP_RESET, 0x5A);
-            delay(1); 
-            // Read the motion registers one time to clear
-            for (uint8_t ii = 0; ii < 5; ii++)
-            {
-                readByte(MOTION + ii);
-                delayMicroseconds(2);
-            }
-        }
-
-        void shutdown()
-        {
-            // Enter shutdown mode
-            writeByte(SHUTDOWN, 0xB6);
-        }
-
-        uint8_t       m_csPin;
-        orientation_t m_orientation;
-        uint8_t       m_resolution;
 
         void writeByte(uint8_t reg, uint8_t value) 
         {
@@ -194,6 +155,61 @@ class PAA3905 {
             SPI.endTransaction();
 
             return temp;
+        }
+
+        /*
+        // XXX useful?
+        void exitFrameCaptureMode()
+        {
+            writeByteDelay(0x7F, 0x00);
+            writeByteDelay(0x55, 0x00);
+            writeByteDelay(0x7F, 0x13);
+            writeByteDelay(0x42, 0x00);
+            writeByteDelay(0x7F, 0x00);
+            writeByteDelay(0x67, 0xA5);
+        }
+        */
+
+    private:
+
+        static const uint8_t PRODUCT_ID          = 0x00; // default value = 0xA2
+        static const uint8_t MOTION              = 0x02;
+        static const uint8_t POWER_UP_RESET      = 0x3A;
+        static const uint8_t SHUTDOWN            = 0x3B;
+        static const uint8_t RESOLUTION          = 0x4E;
+        static const uint8_t ORIENTATION         = 0x5B;
+        static const uint8_t INVERSE_PRODUCT_ID  = 0x5F ;// default value = 0x5D
+
+        orientation_t m_orientation;
+        uint8_t       m_resolution;
+
+        void setResolution(uint8_t res) 
+        {
+            writeByte(RESOLUTION, res);
+        }
+
+        void setOrientation(uint8_t orient) 
+        {
+            writeByte(ORIENTATION, orient);
+        }
+
+        void reset()
+        {
+            // Power up reset
+            writeByte(POWER_UP_RESET, 0x5A);
+            delay(1); 
+            // Read the motion registers one time to clear
+            for (uint8_t ii = 0; ii < 5; ii++)
+            {
+                readByte(MOTION + ii);
+                delayMicroseconds(2);
+            }
+        }
+
+        void shutdown()
+        {
+            // Enter shutdown mode
+            writeByte(SHUTDOWN, 0xB6);
         }
 
         // Performance optimization registers for the three different modes
@@ -337,18 +353,5 @@ class PAA3905 {
 
         } // enhancedDetection
 
-        /*
-
-        // XXX useful?
-        void exitFrameCaptureMode()
-        {
-            writeByteDelay(0x7F, 0x00);
-            writeByteDelay(0x55, 0x00);
-            writeByteDelay(0x7F, 0x13);
-            writeByteDelay(0x42, 0x00);
-            writeByteDelay(0x7F, 0x00);
-            writeByteDelay(0x67, 0xA5);
-        }
-        */
  
 }; // class PAA3905
