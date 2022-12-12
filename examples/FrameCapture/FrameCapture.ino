@@ -65,41 +65,6 @@ void loop()
         _sensor.readBurstMode(); // use burst mode to read all of the data
     }
 
-    if (_sensor.motionDataAvailable()) { 
-
-        if (_sensor.challengingSurfaceDetected()) {
-            Debugger::printf("Challenging surface detected!\n");
-        }
-
-        int16_t deltaX = _sensor.getDeltaX();
-        int16_t deltaY = _sensor.getDeltaY();
-
-        uint8_t surfaceQuality = _sensor.getSurfaceQuality();
-        uint8_t rawDataSum = _sensor.getRawDataSum();
-        uint8_t rawDataMax = _sensor.getRawDataMax();
-        uint8_t rawDataMin = _sensor.getRawDataMin();
-
-        uint32_t shutter = _sensor.getShutter();
-
-        PAA3905::lightMode_t lightMode = _sensor.getLightMode();
-
-        static const char * light_mode_names[4] = {"Bright", "Low", "Super-low", "Unknown"};
-        Debugger::printf("\n%s light mode\n", light_mode_names[lightMode]);
-
-        // Don't report X,Y if surface quality and shutter are under thresholds
-        if (_sensor.dataAboveThresholds(lightMode, surfaceQuality, shutter)) {
-            Debugger::printf("X: %d  Y: %d\n", deltaX, deltaY);
-        }
-        else {
-            Debugger::printf("Data is below thresholds for X,Y reporting\n");
-        }
-
-        Debugger::printf("Number of Valid Features: %d, shutter: 0x%X\n",
-                4*surfaceQuality, shutter);
-        Debugger::printf("Max raw data: %d  Min raw data: %d  Avg raw data: %d\n",
-                rawDataMax, rawDataMin, rawDataSum);
-    }
-
     // Frame capture
     if (iterations >= 100) // capture one frame per 100 iterations (~5 sec) of navigation
     {
@@ -109,9 +74,12 @@ void loop()
 
         uint32_t frameTime = millis();
         static uint8_t frameArray[1225];
+
         _sensor.enterFrameCaptureMode();   
         _sensor.captureFrame(frameArray);
+     
         _sensor.exitFrameCaptureMode(); // exit fram capture mode
+
         Debugger::printf("Frame time = %d ms\n", millis() - frameTime);
 
         for (uint8_t ii = 0; ii < 35; ii++) {
@@ -142,7 +110,6 @@ void loop()
         Debugger::printf("Back in Navigation mode!\n");
     }
 
-    //  STM32L4.sleep();
     delay(50); // limit reporting to 20 Hz
 
 } // loop
