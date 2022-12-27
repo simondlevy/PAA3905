@@ -69,7 +69,7 @@ class PAA3905 {
             // Clear interrupt
             readByte(MOTION); // clears motion interrupt
 
-            return readByte(PRODUCT_ID) == 0xA2 &&
+            return readByte(FORWARD_PRODUCT_ID) == 0xA2 &&
                 readByte(INVERSE_PRODUCT_ID) == 0x5D;
         }
 
@@ -177,7 +177,7 @@ class PAA3905 {
 
     private:
 
-        static const uint8_t PRODUCT_ID          = 0x00; // default value = 0xA2
+        static const uint8_t FORWARD_PRODUCT_ID  = 0x00; // default value = 0xA2
         static const uint8_t MOTION              = 0x02;
         static const uint8_t POWER_UP_RESET      = 0x3A;
         static const uint8_t SHUTDOWN            = 0x3B;
