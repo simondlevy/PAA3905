@@ -7,10 +7,11 @@
  */
 
 #include <SPI.h>
-#include "PAA3905_FrameCapture.h"
-#include "Debugger.h"
 
-static const uint8_t CS_PIN  = 5; 
+#include "PAA3905_FrameCapture.hpp"
+#include "Debugger.hpp"
+
+static const uint8_t CS_PIN  = SS; 
 
 static const uint32_t FRAME_PERIOD_MSEC = 3000;
 

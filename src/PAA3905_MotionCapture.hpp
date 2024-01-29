@@ -10,7 +10,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-#include "PAA3905.h"
+#include "PAA3905.hpp"
 
 class PAA3905_MotionCapture : public PAA3905 {
 

@@ -8,11 +8,11 @@
 
 #include <SPI.h>
 
-#include "PAA3905_MotionCapture.h"
-#include "Debugger.h"
+#include "PAA3905_MotionCapture.hpp"
+#include "Debugger.hpp"
 
-static const uint8_t CS_PIN  = 5; 
-static const uint8_t MOT_PIN = 32; 
+static const uint8_t CS_PIN  = SS; 
+static const uint8_t MOT_PIN = 23; 
 
 PAA3905_MotionCapture _sensor(
         SPI,
