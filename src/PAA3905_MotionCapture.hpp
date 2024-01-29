@@ -17,6 +17,16 @@ class PAA3905_MotionCapture : public PAA3905 {
     public:
 
         PAA3905_MotionCapture(
+                const detectionMode_t detectionMode, 
+                const autoMode_t autoMode,     
+                const orientation_t orientation,
+                const uint8_t resolution) 
+            : PAA3905_MotionCapture(
+                    SPI, SS, detectionMode, autoMode, orientation, resolution)
+        { 
+        }
+
+        PAA3905_MotionCapture(
                 SPIClass & spi,
                 const uint8_t csPin,
                 const detectionMode_t detectionMode, 
@@ -28,7 +38,8 @@ class PAA3905_MotionCapture : public PAA3905 {
             m_autoMode = autoMode;     
         }
 
-        void readMotionCount(int16_t * deltaX, int16_t * deltaY, uint8_t * squal, uint32_t * shutter)
+        void readMotionCount(
+                int16_t * deltaX, int16_t * deltaY, uint8_t * squal, uint32_t * shutter)
         {
             *deltaX =  ((int16_t) readByte(DELTA_X_H) << 8) | readByte(DELTA_X_L);
             *deltaY =  ((int16_t) readByte(DELTA_Y_H) << 8) | readByte(DELTA_X_L);

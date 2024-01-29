@@ -11,12 +11,9 @@
 #include "PAA3905_MotionCapture.hpp"
 #include "Debugger.hpp"
 
-static const uint8_t CS_PIN  = SS; 
 static const uint8_t MOT_PIN = 23; 
 
 PAA3905_MotionCapture _sensor(
-        SPI,
-        CS_PIN,
         PAA3905::DETECTION_STANDARD,
         PAA3905::AUTO_MODE_01,
         PAA3905::ORIENTATION_NORMAL,
