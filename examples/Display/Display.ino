@@ -11,7 +11,7 @@
 #include "PAA3905_FrameCapture.hpp"
 #include "Debugger.hpp"
 
-static const uint32_t FPS = 10;
+static const uint32_t FPS = 18;
 
 static const uint8_t RESOLUTION = 0x2A;
 
