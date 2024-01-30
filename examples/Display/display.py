@@ -13,7 +13,7 @@ import cv2
 import numpy as np
 from sys import stdout
 
-SCALEUP = 50
+SCALEUP = 10
 FONT = cv2.FONT_HERSHEY_SIMPLEX
 FONT_SIZE = 0.5
 FONT_COLOR = (255,255,255)
@@ -47,6 +47,7 @@ while True:
         resized = cv2.resize(image, (35*SCALEUP,35*SCALEUP), 
                 interpolation= cv2.INTER_NEAREST)
 
+        '''
         for j in range(35):
             for k in range(35):
                 cv2.putText(resized,
@@ -54,7 +55,9 @@ while True:
                             (j*SCALEUP+SCALEUP//4,k*SCALEUP+SCALEUP//2),
                             FONT, FONT_SIZE, FONT_COLOR, FONT_THICKNESS, cv2.LINE_AA)
 
-        cv2.imshow(      'VL53L5 [ESC to quit]', resized)
+        '''
+
+        cv2.imshow(      'PAA3905 [ESC to quit]', resized)
 
         if cv2.waitKey(1) == 27:
             break
