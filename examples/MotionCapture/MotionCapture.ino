@@ -1,5 +1,5 @@
 /*
-   the PAA3905 optical flow sensor motion detection example
+   PAA3905 optical flow sensor motion detection example
 
    Copyright (c) 2021 Tlera Corporiation and Simon D. Levy
 

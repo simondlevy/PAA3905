@@ -1,5 +1,5 @@
 /*
-   PAA3905 optical flow sensor frame-capture example
+   PAA3905 optical flow sensor display example
 
    Copyright (c) 2021 Tlera Corporiation and Simon D. Levy
 
@@ -11,7 +11,7 @@
 #include "PAA3905_FrameCapture.hpp"
 #include "Debugger.hpp"
 
-static const uint32_t FRAME_PERIOD_MSEC = 3000;
+static const uint32_t FPS = 10;
 
 static const uint8_t RESOLUTION = 0x2A;
 
@@ -36,7 +36,7 @@ void loop()
 
     uint32_t msec = millis();
 
-    if (msec - _lastCaptureMsec > FRAME_PERIOD_MSEC) {
+    if (msec - _lastCaptureMsec > 1000/FPS) {
 
         _lastCaptureMsec = msec;
 
@@ -44,25 +44,17 @@ void loop()
 
         _sensor.captureFrame(frameArray);
 
-        Debugger::printf("Frame time = %d ms\n", millis() - _lastCaptureMsec);
-
         for (uint8_t j = 0; j < 35; j++) {
-
-            Debugger::printf("%2d ", j);
 
             for (uint8_t k = 0; k < 35; k++) {
 
-                // Debugger::printf() would be too slow here
-                Serial.print(frameArray[j*35 + k]);
-                Serial.print(" ");  
+                Serial.write(frameArray[j*35 + k]);
             }
-            Debugger::printf("\n");
         }
-        Debugger::printf("\n");
 
-        Debugger::printf("Frame time = %d ms\n", millis() - _lastCaptureMsec);
+        Serial.write(0xFF); // sentinel byte
     }
 
-} // loop
+}
 
 
