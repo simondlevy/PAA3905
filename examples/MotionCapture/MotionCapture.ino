@@ -11,6 +11,7 @@
 #include "PAA3905_MotionCapture.hpp"
 #include "Debugger.hpp"
 
+// Set to 0 for continuous read
 static const uint8_t MOT_PIN = 23; 
 
 PAA3905_MotionCapture _sensor(
@@ -42,13 +43,15 @@ void setup()
 
     Debugger::printf("Resolution is %0.1f CPI per meter height\n", _sensor.getResolution());
 
-    pinMode(MOT_PIN, INPUT); 
-    attachInterrupt(MOT_PIN, motionInterruptHandler, FALLING);
+    if (MOT_PIN) {
+        pinMode(MOT_PIN, INPUT); 
+        attachInterrupt(MOT_PIN, motionInterruptHandler, FALLING);
+    }
 } 
 
 void loop()
 {
-    if (gotMotionInterrupt) {
+    if (!MOT_PIN || gotMotionInterrupt) {
 
         gotMotionInterrupt = false;
 
@@ -81,7 +84,7 @@ void loop()
 
             // Don't report X,Y if surface quality and shutter are under thresholds
             if (_sensor.dataAboveThresholds(lightMode, surfaceQuality, shutter)) {
-                Debugger::printf("X: %d  Y: %d\n", deltaX, deltaY);
+                Debugger::printf("X: %+03d  Y: %+03d\n", deltaX, deltaY);
             }
             else {
                 Debugger::printf("Data is below thresholds for X,Y reporting\n");
