@@ -1,6 +1,6 @@
 <a href="https://www.tindie.com/products/onehorse/paa3905-optical-flow-camera/">
-<img src="media/image.jpg" align="left", height=300></a>
-<img src="media/movie.gif" align="right" height=300>
+<img src="media/image.jpg" align="left", height=400></a>
+<img src="media/movie.gif" align="right" height=400>
 
 <br><br><br><br> <br><br><br><br><br><br><br><br>
 
