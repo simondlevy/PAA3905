@@ -3,7 +3,6 @@
 <img src="media/movie.gif" align="right" height=350>
 
 <br><br><br><br> <br><br><br><br><br><br><br><br><br><br><br><br> <br><br><br><br><br><br><br><br>
-<br><br><br><br> <br><br><br><br><br><br><br><br><br><br><br><br> <br><br><br><br><br><br><br><br>
 
 # PAA3905
 Header-only Arduino library for the
