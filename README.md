@@ -2,14 +2,7 @@
 <img src="media/paa3905.jpg" align="left", height=300></a>
 <img src="media/new.gif" align="right" height=300>
 
-\  
-  
-  
-  
-  
-  
-  
-  
+<br><br> <br><br> <br><br> <br><br> <br><br> <br><br> <br><br> 
   
 
 # PAA3905
