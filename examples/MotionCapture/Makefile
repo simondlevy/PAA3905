@@ -1,4 +1,4 @@
-SKETCH = MotionCapture
+SKETCH = $(shell basename "`pwd`")
 
 FQBN = teensy:avr:teensy40
 

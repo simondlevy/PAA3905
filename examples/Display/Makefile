@@ -1,4 +1,4 @@
-SKETCH = Display
+SKETCH = $(shell basename "`pwd`")
 
 FQBN = teensy:avr:teensy40
 

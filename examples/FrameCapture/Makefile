@@ -1,4 +1,4 @@
-SKETCH = FrameCapture
+SKETCH = $(shell basename "`pwd`")
 
 FQBN = teensy:avr:teensy40
 
