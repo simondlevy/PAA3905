@@ -1,7 +1,6 @@
 <a href="https://www.tindie.com/products/onehorse/paa3905-optical-flow-camera/">
-<img src="media/paa3905.jpg" height=300></a>
-<img src="media/new.gif" width=300 height=300 align="top">
-
+<img src="media/paa3905.jpg" height=100></a>
+<img src="media/new.gif" width=100 height=100>
 
 # PAA3905
 Header-only Arduino library for the
